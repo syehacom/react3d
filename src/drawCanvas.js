@@ -1,12 +1,12 @@
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
-import { HAND_CONNECTIONS, NormalizedLandmarkListList, Results } from '@mediapipe/hands';
+import { HAND_CONNECTIONS } from '@mediapipe/hands';
 
 /**
  * cnavasに描画する
  * @param ctx canvas context
  * @param results 手の検出結果
  */
-export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
+export const drawCanvas = (ctx, results) => {
 	const width = ctx.canvas.width
 	const height = ctx.canvas.height
 
@@ -35,7 +35,7 @@ export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
  * @param ctx
  * @param handLandmarks
  */
-const drawCircle = (ctx: CanvasRenderingContext2D, handLandmarks: NormalizedLandmarkListList) => {
+const drawCircle = (ctx, handLandmarks) => {
 	if (handLandmarks.length === 2 && handLandmarks[0].length > 8 && handLandmarks[1].length > 8) {
 		const width = ctx.canvas.width
 		const height = ctx.canvas.height
