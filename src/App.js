@@ -1,20 +1,21 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Hands } from "@mediapipe/hands";
 import { drawCanvas } from "./drawCanvas";
+import { HexColorPicker } from "react-colorful";
 
 export const App = () => {
+  const [colors, setColors] = useState("#fffff");
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const resultsRef = useRef(null);
-  /**
-   * 検出結果（フレーム毎に呼び出される）
-   * @param results
-   */
+  const changeHandler = (newColor) => {
+    setColors(newColor);
+  };
+
   const onResults = useCallback((results) => {
     resultsRef.current = results;
-
     const canvasCtx = canvasRef.current.getContext("2d");
     drawCanvas(canvasCtx, results);
   }, []);
@@ -41,18 +42,14 @@ export const App = () => {
         onFrame: async () => {
           await hands.send({ image: webcamRef.current.video });
         },
-        width: 1280,
-        height: 720,
+        width: 480,
+        height: 480,
       });
       camera.start();
     }
   }, [onResults]);
 
   /** 検出結果をconsoleに出力する */
-  const OutputData = () => {
-    const results = resultsRef.current;
-    console.log(results.multiHandLandmarks);
-  };
 
   return (
     <div
@@ -68,42 +65,43 @@ export const App = () => {
     >
       {/* capture */}
       <Webcam
-        audio={false}
-        style={{ visibility: "hidden" }}
-        width={1280}
-        height={720}
         ref={webcamRef}
+        style={{ visibility: "hidden" }}
+        audio={false}
+        width={480}
+        height={480}
         screenshotFormat="image/jpeg"
-        videoConstraints={{ width: 1280, height: 720, facingMode: "user" }}
+        videoConstraints={{ width: 480, height: 480, facingMode: "user" }}
       />
       {/* draw */}
       <canvas
         ref={canvasRef}
         style={{
           position: "absolute",
-          width: "1280px",
-          height: "720px",
+          width: "480px",
+          height: "480px",
+          border: `10px solid ${colors}`,
           backgroundColor: "#fff",
         }}
-        width={1280}
-        height={720}
+        width={480}
+        height={480}
       />
       {/* output */}
       <div style={{ position: "absolute", top: "20px", left: "20px" }}>
-        <button
+        <div
           style={{
-            color: "#fff",
-            backgroundColor: "#0082cf",
-            fontSize: "1rem",
-            border: "none",
-            borderRadius: "5px",
-            padding: "10px 10px",
-            cursor: "pointer",
+            position: "absolute",
+            top: "20px",
+            left: "20px",
+            padding: "20px",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
+            borderRadius: "10px",
+            display: "flex",
+            flexDirection: "column",
           }}
-          onClick={OutputData}
         >
-          Output Data
-        </button>
+          <HexColorPicker color={colors} onChange={changeHandler} />
+        </div>
       </div>
     </div>
   );
