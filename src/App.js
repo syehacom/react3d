@@ -27,7 +27,7 @@ export default function App() {
         style={{
           position: "absolute",
           bottom: "20px",
-          right: "2px",
+          right: "20px",
           padding: "20px",
           backgroundColor: "rgba(0, 0, 0, 0.2)",
           borderRadius: "10px",

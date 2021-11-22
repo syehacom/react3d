@@ -46,7 +46,7 @@ export default function Face() {
         drawConnectors(ctx, landmarks, FACEMESH_LEFT_IRIS, left_eye);
         drawConnectors(ctx, landmarks, FACEMESH_FACE_OVAL, face_oval);
         drawConnectors(ctx, landmarks, FACEMESH_LIPS, face_oval);
-        drawPoint(ctx, landmarks);
+        drawPoint(ctx, landmarks[1]);
       }
     }
     ctx.restore();
@@ -92,28 +92,28 @@ export default function Face() {
 
   return (
     <div>
-        <Webcam
-          ref={webcamRef}
-          style={{ visibility: "hidden" }}
-          audio={false}
-          width={200}
-          height={200}
-          mirrored
-          screenshotFormat="image/jpeg"
-          videoConstraints={{ width: 200, height: 200, facingMode: "user" }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            width: "200px",
-            height: "200px",
-            border: "1px solid #fff",
-            backgroundColor: "#fff",
-          }}
-          width={200}
-          height={200}
-        />
+      <Webcam
+        ref={webcamRef}
+        style={{ visibility: "hidden" }}
+        audio={false}
+        width={200}
+        height={200}
+        mirrored
+        screenshotFormat="image/jpeg"
+        videoConstraints={{ width: 200, height: 200, facingMode: "user" }}
+      />
+      <canvas
+        ref={canvasRef}
+        style={{
+          borderRadius: "10px",
+          bottom: "2px",
+          left: "0px",
+          padding: "20px",
+          position: "absolute",
+        }}
+        width={200}
+        height={200}
+      />
     </div>
   );
 }
