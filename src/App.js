@@ -1,18 +1,14 @@
-import React, { useState, Suspense } from "react";
+import React, { useContext, Suspense } from "react";
 import { HexColorPicker } from "react-colorful";
-import Hand from "./components/Hand";
 import Face from "./components/Face";
 import Mate from "./components/Mate";
+import { ColorsContext } from "./contexts/ColorsContext";
 
 export default function App() {
-  const [colors, setColors] = useState("#fff");
-  const [change, setChange] = useState(false);
+  const { colors, changeColors } = useContext(ColorsContext);
 
   const colorHandler = (newColor) => {
-    setColors(newColor);
-  };
-  const changeHandler = () => {
-    setChange(!change);
+    changeColors(newColor);
   };
 
   return (
@@ -27,25 +23,36 @@ export default function App() {
         alignItems: "center",
       }}
     >
-      <button
+      <div
         style={{
-          color: "#fff",
-          backgroundColor: colors,
-          fontSize: "1rem",
-          border: "none",
-          borderRadius: "5px",
-          padding: "10px 10px",
-          cursor: "pointer",
+          position: "absolute",
+          bottom: "20px",
+          right: "2px",
+          padding: "20px",
+          backgroundColor: "rgba(0, 0, 0, 0.2)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
         }}
-        onClick={changeHandler}
       >
-        切り替え
-      </button>
-      <Suspense fallback={null}>
-        {/* <Face /> */}
-        <Hand />
-        <Mate />
-      </Suspense>
+        <Suspense fallback={null}>
+          <Mate />
+        </Suspense>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "300px",
+          left: "20px",
+          padding: "20px",
+          backgroundColor: "rgba(0, 0, 0, 0.2)",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Face />
+      </div>
       <div
         style={{
           position: "absolute",

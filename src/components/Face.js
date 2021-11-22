@@ -80,8 +80,8 @@ export default function Face() {
         onFrame: async () => {
           await faceMesh.send({ image: webcamRef.current.video });
         },
-        width: 480,
-        height: 480,
+        width: 240,
+        height: 240,
       });
       camera.start();
     }
@@ -96,23 +96,23 @@ export default function Face() {
           ref={webcamRef}
           style={{ visibility: "hidden" }}
           audio={false}
-          width={480}
-          height={480}
+          width={200}
+          height={200}
           mirrored
           screenshotFormat="image/jpeg"
-          videoConstraints={{ width: 480, height: 480, facingMode: "user" }}
+          videoConstraints={{ width: 200, height: 200, facingMode: "user" }}
         />
         <canvas
           ref={canvasRef}
           style={{
             position: "absolute",
-            width: "480px",
-            height: "480px",
+            width: "200px",
+            height: "200px",
             border: "1px solid #fff",
             backgroundColor: "#fff",
           }}
-          width={480}
-          height={480}
+          width={200}
+          height={200}
         />
     </div>
   );
