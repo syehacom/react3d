@@ -2,7 +2,7 @@ import React, { useContext, Suspense } from "react";
 import { HexColorPicker } from "react-colorful";
 import Media from "./components/Media";
 import Mate from "./components/Mate";
-import { ColorsContext } from "./stores/ColorsContext";
+import { ColorsContext } from "./contexts/ColorsContext";
 
 export default function App() {
   const { colors, changeColors } = useContext(ColorsContext);

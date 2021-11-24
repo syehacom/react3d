@@ -10,8 +10,8 @@ import React, {
 // import { TFloor } from "../utils/TFloor";
 // import { TLight } from "../utils/TLight";
 // import { BridgeContextProvider } from "../contexts/BridgeContext";
-import { ColorsContext } from "../stores/ColorsContext";
-import { PositionsContext } from "../stores/PositionsContext";
+import { ColorsContext } from "../contexts/ColorsContext";
+import { PositionsContext } from "../contexts/PositionsContext";
 import socketIOClient from "socket.io-client";
 
 // const ModelPath = "/assets/model.glb";
@@ -31,7 +31,6 @@ export default function Mate() {
     socket.on("FromAPI", (data) => {
       if (data) {
         setResponse(data.x);
-        console.log(data.x)
       }
     });
     return () => socket.disconnect();
