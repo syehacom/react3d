@@ -2,9 +2,8 @@ import React, { useRef } from "react";
 import { DirectionalLightHelper } from "three";
 import { useHelper } from "@react-three/drei";
 
-export const TDirectionalLight = (props) => {
+export const TLight = (props) => {
   const { position, isHelper = false } = props;
-
   const lightRef = useRef();
   useHelper(lightRef, DirectionalLightHelper);
 
@@ -14,16 +13,16 @@ export const TDirectionalLight = (props) => {
         <directionalLight
           ref={lightRef}
           position={position}
-          intensity={1} // 光の強さ
-          shadow-mapSize-width={2048} // 描画精度
+          intensity={1}
+          shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
           castShadow
         />
       ) : (
         <directionalLight
           position={position}
-          intensity={1} // 光の強さ
-          shadow-mapSize-width={2048} // 描画精度
+          intensity={1}
+          shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
           castShadow
         />

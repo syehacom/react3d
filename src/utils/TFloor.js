@@ -1,8 +1,8 @@
 import React from "react";
 import { DoubleSide } from "three";
 
-export const TFloorPlane = (props) => {
-  const { size = [10, 10], color = "white", isGridHelper = false } = props;
+export const TFloor = (props) => {
+  const { size = [10, 10], color = "#fff", isGridHelper = false } = props;
 
   return (
     <>

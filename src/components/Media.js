@@ -1,24 +1,31 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useEffect, useCallback, useContext, useRef } from "react";
 import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors } from "@mediapipe/drawing_utils";
 import {
   FaceMesh,
+  FACEMESH_TESSELATION,
+  FACEMESH_LIPS,
   FACEMESH_FACE_OVAL,
   FACEMESH_LEFT_EYE,
   FACEMESH_LEFT_EYEBROW,
   FACEMESH_LEFT_IRIS,
-  FACEMESH_LIPS,
   FACEMESH_RIGHT_EYE,
   FACEMESH_RIGHT_EYEBROW,
   FACEMESH_RIGHT_IRIS,
-  FACEMESH_TESSELATION,
 } from "@mediapipe/face_mesh";
+import { ColorsContext } from "../stores/ColorsContext";
+import { PositionsContext } from "../stores/PositionsContext";
+import socketIOClient from "socket.io-client";
 
-export default function Face() {
+export default function Media() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const resultsRef = useRef(null);
+  const { colors } = useContext(ColorsContext);
+  const { changePositions } = useContext(PositionsContext);
+  const ENDPOINT = "http://127.0.0.1:3001";
+  const socket = socketIOClient(ENDPOINT);
 
   const onResults = useCallback((results) => {
     resultsRef.current = results;
@@ -28,28 +35,46 @@ export default function Face() {
     ctx.save();
     ctx.clearRect(0, 0, width, height);
 
+    ctx.globalCompositeOperation = "source-over";
     ctx.drawImage(results.image, 0, 0, width, height);
     if (results.multiFaceLandmarks) {
-      const lineWidth = 1;
-      const tesselation = { color: "#C0C0C070", lineWidth };
-      const right_eye = { color: "#FF3030", lineWidth };
-      const left_eye = { color: "#30FF30", lineWidth };
-      const face_oval = { color: "#E0E0E0", lineWidth };
-
       for (const landmarks of results.multiFaceLandmarks) {
-        drawConnectors(ctx, landmarks, FACEMESH_TESSELATION, tesselation);
-        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_EYE, right_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_EYEBROW, right_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_IRIS, right_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_LEFT_EYE, left_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_LEFT_EYEBROW, left_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_LEFT_IRIS, left_eye);
-        drawConnectors(ctx, landmarks, FACEMESH_FACE_OVAL, face_oval);
-        drawConnectors(ctx, landmarks, FACEMESH_LIPS, face_oval);
+        drawConnectors(ctx, landmarks, FACEMESH_TESSELATION, {
+          color: "#C0C0C070",
+          lineWidth: 1,
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_EYE, {
+          color: "#FF3030",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_EYEBROW, {
+          color: "#FF3030",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_RIGHT_IRIS, {
+          color: "#FF3030",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_LEFT_EYE, {
+          color: "#30FF30",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_LEFT_EYEBROW, {
+          color: "#30FF30",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_LEFT_IRIS, {
+          color: "#30FF30",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_FACE_OVAL, {
+          color: "#E0E0E0",
+        });
+        drawConnectors(ctx, landmarks, FACEMESH_LIPS, {
+          color: "#E0E0E0",
+        });
         drawPoint(ctx, landmarks[1]);
+        if (socket !== undefined) {
+          socket.emit("FromAPI", landmarks[1]);
+        }
       }
     }
     ctx.restore();
+    // eslint-disable-next-line
   }, []);
 
   const drawPoint = (ctx, point) => {
@@ -80,8 +105,8 @@ export default function Face() {
         onFrame: async () => {
           await faceMesh.send({ image: webcamRef.current.video });
         },
-        width: 240,
-        height: 240,
+        width: 300,
+        height: 300,
       });
       camera.start();
     }
@@ -91,29 +116,34 @@ export default function Face() {
   }, [onResults]);
 
   return (
-    <div>
+    <div
+      style={{
+        width: "300px",
+        height: "300px",
+      }}
+    >
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
         audio={false}
-        width={200}
-        height={200}
+        width={300}
+        height={300}
         mirrored
         screenshotFormat="image/jpeg"
-        videoConstraints={{ width: 200, height: 200, facingMode: "user" }}
+        videoConstraints={{ width: 300, height: 300, facingMode: "user" }}
       />
       <canvas
         ref={canvasRef}
         style={{
           borderRadius: "10px",
-          bottom: "2px",
+          bottom: "0px",
           left: "0px",
           padding: "20px",
           position: "absolute",
         }}
-        width={200}
-        height={200}
-      />
+        width={300}
+        height={300}
+      ></canvas>
     </div>
   );
 }

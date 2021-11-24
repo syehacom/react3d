@@ -5,7 +5,7 @@ export const TCanvas = (props) => {
   const { children, fov = 50, position = [0, 3, 10] } = props;
   return (
     <Canvas
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: "300px", height: "304px" }}
       camera={{ fov, position }}
       dpr={[1, 2]}
       shadows

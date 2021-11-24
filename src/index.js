@@ -3,12 +3,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { ColorsContextProvider } from "./contexts/ColorsContext";
+import { PositionsContextProvider } from "./contexts/PositionsContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <ColorsContextProvider>
-      <App />
-    </ColorsContextProvider>
+    <PositionsContextProvider>
+      <ColorsContextProvider>
+        <App />
+      </ColorsContextProvider>
+    </PositionsContextProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
