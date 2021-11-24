@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useContext, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors } from "@mediapipe/drawing_utils";
@@ -14,16 +14,12 @@ import {
   FACEMESH_RIGHT_EYEBROW,
   FACEMESH_RIGHT_IRIS,
 } from "@mediapipe/face_mesh";
-import { ColorsContext } from "../stores/ColorsContext";
-import { PositionsContext } from "../stores/PositionsContext";
 import socketIOClient from "socket.io-client";
 
 export default function Media() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const resultsRef = useRef(null);
-  const { colors } = useContext(ColorsContext);
-  const { changePositions } = useContext(PositionsContext);
   const ENDPOINT = "http://127.0.0.1:3001";
   const socket = socketIOClient(ENDPOINT);
 
