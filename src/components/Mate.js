@@ -1,26 +1,7 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-} from "react";
-// import { OrbitControls, useGLTF } from "@react-three/drei";
-// import * as THREE from "three";
-// import { TCanvas } from "../utils/TCanvas";
-// import { TFloor } from "../utils/TFloor";
-// import { TLight } from "../utils/TLight";
-// import { BridgeContextProvider } from "../contexts/BridgeContext";
-import { ColorsContext } from "../contexts/ColorsContext";
-import { PositionsContext } from "../contexts/PositionsContext";
+import React, { useState, useEffect, useRef } from "react";
 import socketIOClient from "socket.io-client";
 
-// const ModelPath = "/assets/model.glb";
-
 export default function Mate() {
-  // const group = useRef();
-  // const { nodes } = useGLTF(ModelPath);
-  const { colors } = useContext(ColorsContext);
-  const { positions } = useContext(PositionsContext);
   const canvasRef = useRef(null);
   const ENDPOINT = "http://127.0.0.1:3001";
   const [response, setResponse] = useState("");
@@ -30,32 +11,89 @@ export default function Mate() {
     socket.connect();
     socket.on("FromAPI", (data) => {
       if (data) {
-        setResponse(data.x);
+        setResponse(data);
       }
     });
     return () => socket.disconnect();
-  }, []);
-  
-  // const material = new THREE.MeshStandardMaterial({
-  //   color: colors,
-  //   roughness: 0.5,
-  //   metalness: 0.5,
-  //   opacity: 1,
-  //   transparent: true,
-  // });
+  }, [response]);
+
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
     const width = ctx.canvas.width;
     const height = ctx.canvas.height;
-    ctx.save();
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = colors;
-    if (positions) {
-      ctx.fillRect(100, 100, 100, 100);
+
+    if (!response) {
+      return;
     } else {
-      ctx.fillRect(0, 0, 300, 300);
+      // response.forEach((e) => {
+      // const keypoints = e.scaledMesh;
+      // const boundingBox = e.boundingBox;
+      // const bottomRight = boundingBox.bottomRight;
+      // const topLeft = boundingBox.topLeft;
+      // const distance =
+      //   Math.sqrt(
+      //     Math.pow(bottomRight[0] - topLeft[0], 2) +
+      //     Math.pow(topLeft[1] - topLeft[1], 2)
+      //   ) * 0.02;
+      ctx.clearRect(0, 0, width, height);
+      ctx.save();
+      function drawCircle(x2, y2, r2, a2, b2, lineColor) {
+        ctx.beginPath();
+        ctx.arc(x2, y2, r2, a2, b2 * Math.PI);
+        ctx.strokeStyle = lineColor;
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+        ctx.stroke();
+      }
+      function drawsArc(x, y, r, l1, l2) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, l1 * Math.PI, l2 * Math.PI);
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+      }
+      function darwEyes(x1, y1, a1, b1) {
+        ctx.strokeStyle = "#754924";
+        ParamEllipse(ctx, x1, y1, a1, b1);
+        function ParamEllipse(ctx, x, y, a, b) {
+          var step = a > b ? 1 / a : 1 / b;
+          ctx.beginPath();
+          ctx.moveTo(x + a, y);
+          for (var i = 0; i < 2 * Math.PI; i += step) {
+            ctx.lineTo(x + a * Math.cos(i), y + b * Math.sin(i));
+          }
+          ctx.closePath();
+          ctx.fillStyle = "#754924";
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+      drawCircle(150, 150, 150, 0, 2, "#EEE685", "#FCF200");
+      ctx.strokeStyle = "#754924";
+      darwEyes(response[130].x * 300, response[130].y * 300, 13.5, 18.5);
+      drawCircle(
+        response[130].x * 300,
+        response[130].y * 300,
+        9,
+        0,
+        2,
+        "#754924",
+        "#F5F5F5"
+      );
+      darwEyes(response[263].x * 300, response[263].y * 300, 13.5, 18.5);
+      drawCircle(
+        response[263].x * 300,
+        response[263].y * 300,
+        9,
+        0,
+        2,
+        "#754924",
+        "#F5F5F5"
+      );
+      drawsArc(response[35].x * 300, response[35].y * 300, 37.5, 1.3, 1.7);
+      drawsArc(response[265].x * 300, response[265].y * 300, 37.5, 1.3, 1.7);
+      drawsArc(response[13].x * 300, response[13].y * 300, 135, 0.3, 0.7);
     }
-  }, [response, positions, colors]);
+  }, [response]);
 
   return (
     <div
@@ -64,39 +102,18 @@ export default function Mate() {
         height: "300px",
       }}
     >
-      <p>{response}</p>
-        <canvas
-          ref={canvasRef}
-          style={{
-            borderRadius: "10px",
-            bottom: "0px",
-            left: "0px",
-            padding: "20px",
-            position: "absolute",
-          }}
-          width={300}
-          height={300}
-        ></canvas>
-      {/* <TCanvas>
-        <BridgeContextProvider value={{ ...colors }}>
-          <OrbitControls enablePan={false} />
-          <TLight />
-          <group ref={group} dispose={null}>
-            <mesh
-              castShadow
-              receiveShadow
-              geometry={nodes.Cube.geometry}
-              material={material}
-              position={[0, 0, 0]}
-              rotation={[0, 0, 0]}
-              scale={[1, 1, 1]}
-            />
-          </group>
-          <TFloor isGridHelper={true} />
-        </BridgeContextProvider>
-      </TCanvas> */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          borderRadius: "10px",
+          bottom: "0px",
+          left: "0px",
+          padding: "20px",
+          position: "absolute",
+        }}
+        width={300}
+        height={300}
+      ></canvas>
     </div>
   );
 }
-
-// useGLTF.preload(ModelPath);

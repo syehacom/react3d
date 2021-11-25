@@ -1,15 +1,8 @@
-import React, { useContext, Suspense } from "react";
-import { HexColorPicker } from "react-colorful";
-import Media from "./components/Media";
-import Mate from "./components/Mate";
-import { ColorsContext } from "./contexts/ColorsContext";
+import React, { Suspense } from "react";
+import Vrm from "./components/Vrm";
 
 export default function App() {
-  const { colors, changeColors } = useContext(ColorsContext);
 
-  const colorHandler = (newColor) => {
-    changeColors(newColor);
-  };
   return (
     <div
       style={{
@@ -25,51 +18,16 @@ export default function App() {
       <div
         style={{
           position: "absolute",
-          top: "200px",
-          left: "20px",
-          padding: "20px",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          borderRadius: "10px",
+          height: "100%",
+          width:"100%",
+          backgroundColor: "black",
           display: "flex",
           flexDirection: "row",
         }}
       >
         <Suspense fallback={null}>
-          <Mate />
+          <Vrm />
         </Suspense>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "200px",
-          padding: "20px",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          borderRadius: "10px",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <Suspense fallback={null}>
-          <Media />
-        </Suspense>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "200px",
-          right: "20px",
-          padding: "20px",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          borderRadius: "10px",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <HexColorPicker
-          style={{ width: "300px", height: "300px" }}
-          color={colors}
-          onChange={colorHandler}
-        />
       </div>
     </div>
   );

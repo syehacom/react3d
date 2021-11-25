@@ -63,9 +63,9 @@ export default function Media() {
         drawConnectors(ctx, landmarks, FACEMESH_LIPS, {
           color: "#E0E0E0",
         });
-        drawPoint(ctx, landmarks[1]);
+        drawPoint(ctx, landmarks[195]);
         if (socket !== undefined) {
-          socket.emit("FromAPI", landmarks[1]);
+          socket.emit("FromAPI", landmarks);
         }
       }
     }
