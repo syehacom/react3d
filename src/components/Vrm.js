@@ -21,7 +21,6 @@ import Webcam from "react-webcam";
 export default function Vrm() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  const resultsRef = useRef(null);
 
   // VRM
 
@@ -388,7 +387,6 @@ export default function Vrm() {
   }, [onResults]);
 
   const drawResults = (results) => {
-    resultsRef.current = results;
     const ctx = canvasRef.current.getContext("2d");
     const width = ctx.canvas.width;
     const height = ctx.canvas.height;
