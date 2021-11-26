@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
-import { Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { VRM, VRMSchema } from "@pixiv/three-vrm";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as Kalidokit from "../kalidokit";
 import * as THREE from "three";
+import { Vector3 } from "three";
 import { default as Vector } from "../kalidokit/utils/vector.js";
 import * as Utils from "../kalidokit/utils/helpers.js";
 import {
@@ -154,11 +154,9 @@ export default function Vrm() {
       return;
     }
     rigRotation("Neck", riggedFace.head, 0.7);
-
     // Blendshapes and Preset Name Schema
     const Blendshape = vrm.blendShapeProxy;
     const PresetName = VRMSchema.BlendShapePresetName;
-
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
     riggedFace.eye.l = lerp(
@@ -198,7 +196,6 @@ export default function Vrm() {
       PresetName.U,
       lerp(riggedFace.mouth.shape.U, Blendshape.getValue(PresetName.U), 0.5)
     );
-
     //PUPILS
     //interpolate pupil and keep a copy of the value
     let lookTarget = new THREE.Euler(
@@ -441,6 +438,11 @@ export default function Vrm() {
 
   return (
     <>
+      <Inputs
+        onFileChange={handleFileChange}
+        checked={showGrid}
+        onCheckChange={showGridToggle}
+      />
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
@@ -463,11 +465,6 @@ export default function Vrm() {
         width={300}
         height={300}
       ></canvas>
-      <Inputs
-        onFileChange={handleFileChange}
-        checked={showGrid}
-        onCheckChange={showGridToggle}
-      />
       <Canvas camera={{ position: [0, 1, 2] }}>
         <directionalLight />
         <VRMS vrm={vrm} />
