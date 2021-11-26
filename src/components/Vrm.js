@@ -6,8 +6,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as Kalidokit from "../kalidokit";
 import * as THREE from "three";
 import { Vector3 } from "three";
-import { default as Vector } from "../kalidokit/utils/vector.js";
-import * as Utils from "../kalidokit/utils/helpers.js";
 import {
   Holistic,
   FACEMESH_TESSELATION,
@@ -100,8 +98,8 @@ export default function Vrm() {
 
   // Animate //
 
-  const clamp = Utils.clamp;
-  const lerp = Vector.lerp;
+  const lerp = Kalidokit.Vector.lerp;
+  const clamp = Kalidokit.Utils.clamp;
   const rigRotation = (
     name,
     rotation = { x: 0, y: 0, z: 0 },
