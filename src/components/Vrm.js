@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  Suspense,
+} from "react";
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { VRM, VRMSchema } from "@pixiv/three-vrm";
@@ -19,6 +25,9 @@ import Webcam from "react-webcam";
 export default function Vrm() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const lerp = Kalidokit.Vector.lerp;
+  const clamp = Kalidokit.Utils.clamp;
 
   // VRM
 
@@ -60,13 +69,7 @@ export default function Vrm() {
     return [vrm, loadVRM];
   };
 
-  const useToggle = (initialState) => {
-    const [state, setState] = useState(initialState);
-    const toggle = useCallback(() => setState((prev) => !prev), []);
-    return [state, toggle];
-  };
-
-  const [vrm, loadVRM] = useVRM();
+  const [currentVrm, loadVRM] = useVRM();
   const handleFileChange = useCallback(
     async (event) => {
       const url = URL.createObjectURL(event.target.files[0]);
@@ -76,7 +79,72 @@ export default function Vrm() {
     [loadVRM]
   );
 
+  const useToggle = (initialState) => {
+    const [state, setState] = useState(initialState);
+    const toggle = useCallback(() => setState((prev) => !prev), []);
+    return [state, toggle];
+  };
+
   const [showGrid, showGridToggle] = useToggle(false);
+
+  /* THREEJS WORLD SETUP */
+  // let currentVrm;
+
+  // // renderer
+  // const renderer = new THREE.WebGLRenderer({ alpha: true });
+  // renderer.setSize(window.innerWidth, window.innerHeight);
+  // renderer.setPixelRatio(window.devicePixelRatio);
+
+  // // camera
+  // const orbitCamera = new THREE.PerspectiveCamera(
+  //   35,
+  //   window.innerWidth / window.innerHeight,
+  //   0.1,
+  //   1000
+  // );
+  // orbitCamera.position.set(0.0, 1.4, 0.7);
+
+  // const scene = new THREE.Scene();
+
+  // // light
+  // const light = new THREE.DirectionalLight(0xffffff);
+  // light.position.set(1.0, 1.0, 1.0).normalize();
+  // scene.add(light);
+
+  // // Main Render Loop
+  // const clock = new THREE.Clock();
+
+  // const animate = () => {
+  //   requestAnimationFrame(animate);
+  //   if (currentVrm) {
+  //     // Update model to render physics
+  //     currentVrm.update(clock.getDelta());
+  //   }
+  //   renderer.render(scene, orbitCamera);
+  // };
+  // animate();
+
+  // const loader = new GLTFLoader();
+  // loader.crossOrigin = "anonymous";
+  // // Import model from URL, add your own model here
+  // loader.load(
+  //   "/avatar.vrm",
+  //   (gltf) => {
+  //     VRMUtils.removeUnnecessaryJoints(gltf.scene);
+  //     VRM.from(gltf).then((vrm) => {
+  //       scene.add(vrm.scene);
+  //       currentVrm = vrm;
+  //       currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
+  //     });
+  //   },
+  //   (progress) =>
+  //     console.log(
+  //       "Loading model...",
+  //       100.0 * (progress.loaded / progress.total),
+  //       "%"
+  //     ),
+  //   (error) => console.error(error)
+  // );
 
   extend({ OrbitControls });
 
@@ -96,20 +164,20 @@ export default function Vrm() {
     );
   };
 
-  // Animate //
+  // Animate Rotation Helper function
 
-  const lerp = Kalidokit.Vector.lerp;
-  const clamp = Kalidokit.Utils.clamp;
   const rigRotation = (
     name,
     rotation = { x: 0, y: 0, z: 0 },
     dampener = 1,
     lerpAmount = 0.3
   ) => {
-    if (!vrm) {
+    if (!currentVrm) {
       return;
     }
-    const Part = vrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name]);
+    const Part = currentVrm.humanoid.getBoneNode(
+      VRMSchema.HumanoidBoneName[name]
+    );
     if (!Part) {
       return;
     }
@@ -130,10 +198,12 @@ export default function Vrm() {
     dampener = 1,
     lerpAmount = 0.3
   ) => {
-    if (!vrm) {
+    if (!currentVrm) {
       return;
     }
-    const Part = vrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name]);
+    const Part = currentVrm.humanoid.getBoneNode(
+      VRMSchema.HumanoidBoneName[name]
+    );
     if (!Part) {
       return;
     }
@@ -147,12 +217,12 @@ export default function Vrm() {
 
   let oldLookTarget = new THREE.Euler();
   const rigFace = (riggedFace) => {
-    if (!vrm) {
+    if (!currentVrm) {
       return;
     }
     rigRotation("Neck", riggedFace.head, 0.7);
     // Blendshapes and Preset Name Schema
-    const Blendshape = vrm.blendShapeProxy;
+    const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
@@ -202,7 +272,7 @@ export default function Vrm() {
       "XYZ"
     );
     oldLookTarget.copy(lookTarget);
-    vrm.lookAt.applyer.lookAt(lookTarget);
+    currentVrm.lookAt.applyer.lookAt(lookTarget);
   };
 
   /* VRM Character Animator */
@@ -347,10 +417,10 @@ export default function Vrm() {
       // Draw landmark guides
       drawResults(results);
       // Animate model
-      animateVRM(vrm, results);
+      animateVRM(currentVrm, results);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vrm]
+    [currentVrm]
   );
 
   useEffect(() => {
@@ -462,8 +532,17 @@ export default function Vrm() {
         height={300}
       ></canvas>
       <Canvas camera={{ position: [0, 1, 2] }}>
-        <directionalLight />
-        <VRMS vrm={vrm} />
+        <directionalLight
+          color={0xffffff}
+          position={(1.0, 1.0, 1.0)}
+          intensity={1}
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          castShadow
+        />
+        <Suspense fallback={null}>
+          <VRMS vrm={currentVrm} />
+        </Suspense>
         <Controls />
         {showGrid && (
           <>
