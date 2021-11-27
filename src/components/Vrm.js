@@ -21,26 +21,33 @@ import {
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { Camera } from "@mediapipe/camera_utils";
 import Webcam from "react-webcam";
+import Vector from "../kalidokit/utils/vector.js";
 
 export default function Vrm() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const lerp = Kalidokit.Vector.lerp;
-  const clamp = Kalidokit.Utils.clamp;
+  const lerp = Vector.lerp;
+  const clamp = (val, min, max) => {
+    return Math.max(Math.min(val, max), min);
+  };
 
   // VRM
+  useEffect(() => {
+    loadVRM("/avatar.vrm");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const Inputs = ({ onFileChange, checked, onCheckChange }) => (
-    <div style={{ color: "white" }}>
-      <input type="file" accept=".vrm" onChange={onFileChange} />
-      <br />
-      <label>
-        <input type="checkbox" checked={checked} onChange={onCheckChange} />
-        グリッドを表示
-      </label>
-    </div>
-  );
+  // const Inputs = ({ onFileChange, checked, onCheckChange }) => (
+  //   <div style={{ color: "white" }}>
+  //     <input type="file" accept=".vrm" onChange={onFileChange} />
+  //     <br />
+  //     <label>
+  //       <input type="checkbox" checked={checked} onChange={onCheckChange} />
+  //       グリッド
+  //     </label>
+  //   </div>
+  // );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -70,81 +77,22 @@ export default function Vrm() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  const handleFileChange = useCallback(
-    async (event) => {
-      const url = URL.createObjectURL(event.target.files[0]);
-      await loadVRM(url);
-      URL.revokeObjectURL(url);
-    },
-    [loadVRM]
-  );
-
-  const useToggle = (initialState) => {
-    const [state, setState] = useState(initialState);
-    const toggle = useCallback(() => setState((prev) => !prev), []);
-    return [state, toggle];
-  };
-
-  const [showGrid, showGridToggle] = useToggle(false);
-
-  /* THREEJS WORLD SETUP */
-  // let currentVrm;
-
-  // // renderer
-  // const renderer = new THREE.WebGLRenderer({ alpha: true });
-  // renderer.setSize(window.innerWidth, window.innerHeight);
-  // renderer.setPixelRatio(window.devicePixelRatio);
-
-  // // camera
-  // const orbitCamera = new THREE.PerspectiveCamera(
-  //   35,
-  //   window.innerWidth / window.innerHeight,
-  //   0.1,
-  //   1000
-  // );
-  // orbitCamera.position.set(0.0, 1.4, 0.7);
-
-  // const scene = new THREE.Scene();
-
-  // // light
-  // const light = new THREE.DirectionalLight(0xffffff);
-  // light.position.set(1.0, 1.0, 1.0).normalize();
-  // scene.add(light);
-
-  // // Main Render Loop
-  // const clock = new THREE.Clock();
-
-  // const animate = () => {
-  //   requestAnimationFrame(animate);
-  //   if (currentVrm) {
-  //     // Update model to render physics
-  //     currentVrm.update(clock.getDelta());
-  //   }
-  //   renderer.render(scene, orbitCamera);
-  // };
-  // animate();
-
-  // const loader = new GLTFLoader();
-  // loader.crossOrigin = "anonymous";
-  // // Import model from URL, add your own model here
-  // loader.load(
-  //   "/avatar.vrm",
-  //   (gltf) => {
-  //     VRMUtils.removeUnnecessaryJoints(gltf.scene);
-  //     VRM.from(gltf).then((vrm) => {
-  //       scene.add(vrm.scene);
-  //       currentVrm = vrm;
-  //       currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-  //     });
+  // const handleFileChange = useCallback(
+  //   async (event) => {
+  //     const url = URL.createObjectURL(event.target.files[0]);
+  //     await loadVRM(url);
+  //     URL.revokeObjectURL(url);
   //   },
-  //   (progress) =>
-  //     console.log(
-  //       "Loading model...",
-  //       100.0 * (progress.loaded / progress.total),
-  //       "%"
-  //     ),
-  //   (error) => console.error(error)
+  //   [loadVRM]
   // );
+
+  // const useToggle = (initialState) => {
+  //   const [state, setState] = useState(initialState);
+  //   const toggle = useCallback(() => setState((prev) => !prev), []);
+  //   return [state, toggle];
+  // };
+
+  // const [showGrid, showGridToggle] = useToggle(true);
 
   extend({ OrbitControls });
 
@@ -241,6 +189,7 @@ export default function Vrm() {
       riggedFace.head.y
     );
     Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
+    // Blendshape.setValue(PresetName.Blink, riggedFace.eye.r);
 
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
@@ -281,7 +230,7 @@ export default function Vrm() {
       return;
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
-    let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
+    let riggedPose, riggedLeftHand, riggedRightHand;
 
     const faceLandmarks = results.faceLandmarks;
     // Pose 3D Landmarks are with respect to Hip distance in meters
@@ -294,11 +243,12 @@ export default function Vrm() {
 
     // Animate Face
     if (faceLandmarks) {
-      riggedFace = Kalidokit.Face.solve(faceLandmarks, {
+      rigFace(Kalidokit.Face.solve(faceLandmarks), {
         runtime: "mediapipe",
         video: canvasRef,
+        smoothBlink: true, // smooth left and right eye blink delays
+        blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
       });
-      rigFace(riggedFace);
     }
 
     // Animate Pose
@@ -424,34 +374,37 @@ export default function Vrm() {
   );
 
   useEffect(() => {
-    const holistic = new Holistic({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
-      },
-    });
-    holistic.setOptions({
-      modelComplexity: 1,
-      smoothLandmarks: true,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-      refineFaceLandmarks: true,
-    });
-
-    holistic.onResults(onResults);
-
-    if (webcamRef.current) {
-      const camera = new Camera(webcamRef.current.video, {
-        onFrame: async () => {
-          await holistic.send({ image: webcamRef.current.video });
+    if (currentVrm) {
+      const holistic = new Holistic({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
         },
-        width: 300,
-        height: 300,
       });
-      camera.start();
+      holistic.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7,
+        refineFaceLandmarks: true,
+      });
+
+      holistic.onResults(onResults);
+
+      if (webcamRef.current) {
+        const camera = new Camera(webcamRef.current.video, {
+          onFrame: async () => {
+            await holistic.send({ image: webcamRef.current.video });
+          },
+          width: 300,
+          height: 300,
+        });
+        camera.start();
+      }
+      return () => {
+        holistic.close();
+      };
     }
-    return () => {
-      holistic.close();
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onResults]);
 
   const drawResults = (results) => {
@@ -504,11 +457,11 @@ export default function Vrm() {
 
   return (
     <>
-      <Inputs
+      {/* <Inputs
         onFileChange={handleFileChange}
         checked={showGrid}
         onCheckChange={showGridToggle}
-      />
+      /> */}
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
@@ -544,12 +497,12 @@ export default function Vrm() {
           <VRMS vrm={currentVrm} />
         </Suspense>
         <Controls />
-        {showGrid && (
-          <>
-            <gridHelper />
-            <axesHelper />
-          </>
-        )}
+        {/* {showGrid && ( */}
+        <>
+          <gridHelper />
+          <axesHelper />
+        </>
+        {/* )} */}
       </Canvas>
     </>
   );
