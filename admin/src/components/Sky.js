@@ -21,7 +21,7 @@ export default function Vrm(roomId) {
       const effectedDest = Tone.context.createMediaStreamDestination();
       micAudio.connect(shifter);
       // shifter.connect(reverb);
-    //   リバーブを空のノードに接続
+      //   リバーブを空のノードに接続
       shifter.connect(effectedDest);
 
       navigator.mediaDevices
@@ -126,6 +126,7 @@ export default function Vrm(roomId) {
           音声オフ
         </button>
       )}
+      <video ref={localVideoRef} playsInline></video>
       {/* {castVideo()} */}
     </div>
   );
