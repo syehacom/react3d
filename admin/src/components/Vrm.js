@@ -14,7 +14,7 @@ import * as THREE from "three";
 import { Vector3 } from "three";
 import {
   Holistic,
-  // FACEMESH_TESSELATION,
+  FACEMESH_TESSELATION,
   POSE_CONNECTIONS,
   HAND_CONNECTIONS,
 } from "@mediapipe/holistic";
@@ -43,16 +43,15 @@ export default function Vrm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const Inputs = ({ onFileChange, checked, onCheckChange }) => (
-  //   <div style={{ color: "white" }}>
-  //     <input type="file" accept=".vrm" onChange={onFileChange} />
-  //     <br />
-  //     <label>
-  //       <input type="checkbox" checked={checked} onChange={onCheckChange} />
-  //       グリッド
-  //     </label>
-  //   </div>
-  // );
+  const Inputs = ({ onFileChange }) => (
+      <label
+        style={{
+          marginTop: "50px",
+        }}
+      >
+        <input type="file" accept=".vrm" onChange={onFileChange} />
+      </label>
+  );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -82,22 +81,14 @@ export default function Vrm() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  // const handleFileChange = useCallback(
-  //   async (event) => {
-  //     const url = URL.createObjectURL(event.target.files[0]);
-  //     await loadVRM(url);
-  //     URL.revokeObjectURL(url);
-  //   },
-  //   [loadVRM]
-  // );
-
-  // const useToggle = (initialState) => {
-  //   const [state, setState] = useState(initialState);
-  //   const toggle = useCallback(() => setState((prev) => !prev), []);
-  //   return [state, toggle];
-  // };
-
-  // const [showGrid, showGridToggle] = useToggle(true);
+  const handleFileChange = useCallback(
+    async (event) => {
+      const url = URL.createObjectURL(event.target.files[0]);
+      await loadVRM(url);
+      URL.revokeObjectURL(url);
+    },
+    [loadVRM]
+  );
 
   extend({ OrbitControls });
 
@@ -118,7 +109,6 @@ export default function Vrm() {
   };
 
   // Animate Rotation Helper function
-
   const rigRotation = (
     name,
     rotation = { x: 0, y: 0, z: 0 },
@@ -236,10 +226,12 @@ export default function Vrm() {
     }
     if (results.faceLandmarks) {
       results.faceLandmarksZ = {
+        //head
         21: results.faceLandmarks[21],
         251: results.faceLandmarks[251],
         397: results.faceLandmarks[397],
         172: results.faceLandmarks[172],
+        //mouth
         133: results.faceLandmarks[133],
         362: results.faceLandmarks[362],
         130: results.faceLandmarks[130],
@@ -248,21 +240,102 @@ export default function Vrm() {
         14: results.faceLandmarks[14],
         61: results.faceLandmarks[61],
         291: results.faceLandmarks[291],
+        //eye
+        // 160: results.faceLandmarks[160],
+        // 159: results.faceLandmarks[159],
+        // 158: results.faceLandmarks[158],
+        // 144: results.faceLandmarks[144],
+        // 145: results.faceLandmarks[145],
+        // 153: results.faceLandmarks[153],
+        // 387: results.faceLandmarks[387],
+        // 386: results.faceLandmarks[386],
+        // 385: results.faceLandmarks[385],
+        // 373: results.faceLandmarks[373],
+        // 374: results.faceLandmarks[374],
+        // 380: results.faceLandmarks[380],
+        // //brow
+        // 35: results.faceLandmarks[35],
+        // 244: results.faceLandmarks[244],
+        // 63: results.faceLandmarks[63],
+        // 105: results.faceLandmarks[105],
+        // 66: results.faceLandmarks[66],
+        // 229: results.faceLandmarks[229],
+        // 230: results.faceLandmarks[230],
+        // 231: results.faceLandmarks[231],
+        // 265: results.faceLandmarks[265],
+        // 464: results.faceLandmarks[464],
+        // 293: results.faceLandmarks[293],
+        // 334: results.faceLandmarks[334],
+        // 296: results.faceLandmarks[296],
+        // 449: results.faceLandmarks[449],
+        // 450: results.faceLandmarks[450],
+        // 451: results.faceLandmarks[451],
+        // //pupil
+        // 468: results.faceLandmarks[468],
+        // 469: results.faceLandmarks[469],
+        // 470: results.faceLandmarks[470],
+        // 471: results.faceLandmarks[471],
+        // 472: results.faceLandmarks[472],
+        // 473: results.faceLandmarks[473],
+        // 474: results.faceLandmarks[474],
+        // 475: results.faceLandmarks[475],
+        // 476: results.faceLandmarks[476],
+        // 477: results.faceLandmarks[477],
       };
     }
-    results.poseLandmarkZ = {
-      11: results.poseLandmark[11],
-      15: results.poseLandmark[15],
-      16: results.poseLandmark[16],
-      23: results.poseLandmark[23],
-      24: results.poseLandmark[24],
-    };
+    if (results.ea) {
+      delete results.ea[0];
+      delete results.ea[1];
+      delete results.ea[2];
+      delete results.ea[3];
+      delete results.ea[4];
+      delete results.ea[5];
+      delete results.ea[6];
+      delete results.ea[7];
+      delete results.ea[8];
+      delete results.ea[9];
+      delete results.ea[10];
+      delete results.ea[21];
+      delete results.ea[22];
+      delete results.ea[29];
+      delete results.ea[30];
+      delete results.ea[31];
+      delete results.ea[32];
+      delete results.ea[33];
+    }
+    if (results.poseLandmarks) {
+      delete results.poseLandmarks[0];
+      delete results.poseLandmarks[1];
+      delete results.poseLandmarks[2];
+      delete results.poseLandmarks[3];
+      delete results.poseLandmarks[4];
+      delete results.poseLandmarks[5];
+      delete results.poseLandmarks[6];
+      delete results.poseLandmarks[7];
+      delete results.poseLandmarks[8];
+      delete results.poseLandmarks[9];
+      delete results.poseLandmarks[10];
+      delete results.poseLandmarks[13];
+      delete results.poseLandmarks[14];
+      delete results.poseLandmarks[17];
+      delete results.poseLandmarks[18];
+      delete results.poseLandmarks[19];
+      delete results.poseLandmarks[20];
+      delete results.poseLandmarks[21];
+      delete results.poseLandmarks[22];
+      delete results.poseLandmarks[25];
+      delete results.poseLandmarks[26];
+      delete results.poseLandmarks[27];
+      delete results.poseLandmarks[28];
+      delete results.poseLandmarks[29];
+      delete results.poseLandmarks[30];
+      delete results.poseLandmarks[31];
+      delete results.poseLandmarks[32];
+      delete results.poseLandmarks[33];
+    }
     delete results.faceLandmarks;
-    delete results.poseLandmarks;
     delete results.image;
     delete results.multiFaceGeometry;
-
-    console.log(results);
 
     if (socket !== undefined) {
       socket.emit("FromAPI", results);
@@ -274,7 +347,7 @@ export default function Vrm() {
     // Pose 3D Landmarks are with respect to Hip distance in meters
     const pose3DLandmarks = results.ea;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
-    const pose2DLandmarks = results.poseLandmarksZ;
+    const pose2DLandmarks = results.poseLandmarks;
     // Be careful, hand landmarks may be reversed
     const leftHandLandmarks = results.rightHandLandmarks;
     const rightHandLandmarks = results.leftHandLandmarks;
@@ -284,7 +357,7 @@ export default function Vrm() {
       rigFace(Kalidokit.Face.solve(faceLandmarks), {
         runtime: "mediapipe",
         video: canvasRef,
-        smoothBlink: true, // smooth left and right eye blink delays
+        smoothBlink: false, // smooth left and right eye blink delays
         blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
       });
     }
@@ -294,7 +367,7 @@ export default function Vrm() {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
         video: canvasRef,
-        enableLegs: false,
+        enableLegs: true,
       });
       rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
       rigPosition(
@@ -419,8 +492,8 @@ export default function Vrm() {
       holistic.setOptions({
         modelComplexity: 0,
         smoothLandmarks: true,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
         refineFaceLandmarks: true,
       });
 
@@ -458,21 +531,21 @@ export default function Vrm() {
       color: "#ff0364",
       lineWidth: 2,
     });
-    // drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {
-    //   color: "#C0C0C070",
-    //   lineWidth: 1,
-    // });
-    // if (results.faceLandmarks && results.faceLandmarks.length === 478) {
-    //   //draw pupils
-    //   drawLandmarks(
-    //     ctx,
-    //     [results.faceLandmarks[468], results.faceLandmarks[468 + 5]],
-    //     {
-    //       color: "#ffe603",
-    //       lineWidth: 2,
-    //     }
-    //   );
-    // }
+    drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {
+      color: "#C0C0C070",
+      lineWidth: 1,
+    });
+    if (results.faceLandmarks && results.faceLandmarks.length === 478) {
+      //draw pupils
+      drawLandmarks(
+        ctx,
+        [results.faceLandmarks[468], results.faceLandmarks[468 + 5]],
+        {
+          color: "#ffe603",
+          lineWidth: 2,
+        }
+      );
+    }
     drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, {
       color: "#eb1064",
       lineWidth: 5,
@@ -493,17 +566,15 @@ export default function Vrm() {
 
   return (
     <>
-      {/* <Inputs
+      <Inputs
         onFileChange={handleFileChange}
-        checked={showGrid}
-        onCheckChange={showGridToggle}
-      /> */}
+      />
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
         audio={false}
-        width={300}
-        height={300}
+        width={0}
+        height={0}
         mirrored
         screenshotFormat="image/jpeg"
         videoConstraints={{ width: 300, height: 300, facingMode: "user" }}
@@ -520,25 +591,14 @@ export default function Vrm() {
         width={300}
         height={300}
       ></canvas>
-      <Canvas camera={{ position: [0, 1, 2] }}>
-        <directionalLight
-          color={0xffffff}
-          position={(1.0, 1.0, 1.0)}
-          intensity={1}
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          castShadow
-        />
+      <Canvas camera={{ position: [0, 1, 1] }}>
+        <directionalLight />
         <Suspense fallback={null}>
           <VRMS vrm={currentVrm} />
         </Suspense>
         <Controls />
-        {/* {showGrid && ( */}
-        <>
-          <gridHelper />
-          <axesHelper />
-        </>
-        {/* )} */}
+        <gridHelper />
+        <axesHelper />
       </Canvas>
     </>
   );

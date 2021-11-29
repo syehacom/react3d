@@ -1,7 +1,6 @@
 import React from "react";
 import Vrm from "./components/Vrm";
 import Sky from "./components/Sky";
-// import Live from "./components/Live";
 
 export default function App() {
   return (
@@ -16,19 +15,6 @@ export default function App() {
         alignItems: "center",
       }}
     >
-      {/* <div
-        style={{
-          position: "absolute",
-          top: 0,
-          height: "50%",
-          width: "100%",
-          backgroundColor: "black",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <Vrm />
-      </div> */}
       <div
         style={{
           position: "absolute",

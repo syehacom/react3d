@@ -16,13 +16,13 @@ export default function Vrm(roomId) {
     const micAudio = new Tone.UserMedia();
     micAudio.open().then(() => {
       const shifter = new Tone.PitchShift(7);
-      // const reverb = new Tone.Freeverb();
+      const reverb = new Tone.Freeverb();
       // 加工済みの音声を受け取る空のノードを用意
       const effectedDest = Tone.context.createMediaStreamDestination();
       micAudio.connect(shifter);
-      // shifter.connect(reverb);
+      shifter.connect(reverb);
       //   リバーブを空のノードに接続
-      shifter.connect(effectedDest);
+      reverb.connect(effectedDest);
 
       navigator.mediaDevices
         .getUserMedia({ video: false, audio: true })
@@ -104,8 +104,9 @@ export default function Vrm(roomId) {
           style={{
             zIndex: "1",
             border: "1px solid #ccc",
-            height: "50px",
-            width: "100px",
+            top: "10px",
+            height: "25px",
+            width: "110px",
             position: "absolute",
           }}
           onClick={() => onStart()}
@@ -117,8 +118,9 @@ export default function Vrm(roomId) {
           style={{
             zIndex: "1",
             border: "1px solid #ccc",
-            height: "50px",
-            width: "100px",
+            top: "10px",
+            height: "25px",
+            width: "110px",
             position: "absolute",
           }}
           onClick={() => onEnd()}
@@ -126,7 +128,11 @@ export default function Vrm(roomId) {
           音声オフ
         </button>
       )}
-      <video ref={localVideoRef} playsInline></video>
+      <video
+        style={{ width: "0px", height: "0px" }}
+        ref={localVideoRef}
+        playsInline
+      ></video>
       {/* {castVideo()} */}
     </div>
   );
