@@ -240,7 +240,7 @@ export default function Vrm() {
         14: results.faceLandmarks[14],
         61: results.faceLandmarks[61],
         291: results.faceLandmarks[291],
-        //eye
+        // // eye
         // 160: results.faceLandmarks[160],
         // 159: results.faceLandmarks[159],
         // 158: results.faceLandmarks[158],
