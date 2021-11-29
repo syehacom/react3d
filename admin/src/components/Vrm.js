@@ -40,15 +40,15 @@ export default function Vrm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const Inputs = ({ onFileChange }) => (
-      <label
-        style={{
-          marginTop: "50px",
-        }}
-      >
-        <input type="file" accept=".vrm" onChange={onFileChange} />
-      </label>
-  );
+  // const Inputs = ({ onFileChange }) => (
+  //     <label
+  //       style={{
+  //         marginTop: "50px",
+  //       }}
+  //     >
+  //       <input type="file" accept=".vrm" onChange={onFileChange} />
+  //     </label>
+  // );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -78,14 +78,14 @@ export default function Vrm() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  const handleFileChange = useCallback(
-    async (event) => {
-      const url = URL.createObjectURL(event.target.files[0]);
-      await loadVRM(url);
-      URL.revokeObjectURL(url);
-    },
-    [loadVRM]
-  );
+  // const handleFileChange = useCallback(
+  //   async (event) => {
+  //     const url = URL.createObjectURL(event.target.files[0]);
+  //     await loadVRM(url);
+  //     URL.revokeObjectURL(url);
+  //   },
+  //   [loadVRM]
+  // );
 
   extend({ OrbitControls });
 
@@ -306,7 +306,7 @@ export default function Vrm() {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
         video: canvasRef,
-        enableLegs: false,
+        enableLegs: true,
       });
       rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
       rigPosition(
@@ -505,9 +505,9 @@ export default function Vrm() {
 
   return (
     <>
-      <Inputs
+      {/* <Inputs
         onFileChange={handleFileChange}
-      />
+      /> */}
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
