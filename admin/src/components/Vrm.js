@@ -234,6 +234,8 @@ export default function Vrm() {
     if (!vrm) {
       return;
     }
+    delete results.faceLandmarks;
+    console.log(results)
     if (socket !== undefined) {
       socket.emit("FromAPI", results);
     }
@@ -250,14 +252,14 @@ export default function Vrm() {
     const rightHandLandmarks = results.leftHandLandmarks;
 
     // Animate Face
-    if (faceLandmarks) {
-      rigFace(Kalidokit.Face.solve(faceLandmarks), {
-        runtime: "mediapipe",
-        video: canvasRef,
-        smoothBlink: true, // smooth left and right eye blink delays
-        blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
-      });
-    }
+    // if (faceLandmarks) {
+    //   rigFace(Kalidokit.Face.solve(faceLandmarks), {
+    //     runtime: "mediapipe",
+    //     video: canvasRef,
+    //     smoothBlink: true, // smooth left and right eye blink delays
+    //     blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
+    //   });
+    // }
 
     // Animate Pose
     if (pose2DLandmarks && pose3DLandmarks) {

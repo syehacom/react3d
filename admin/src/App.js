@@ -33,7 +33,7 @@ export default function App() {
         style={{
           position: "absolute",
           bottom: 0,
-          height: "50%",
+          height: "100%",
           width: "100%",
           backgroundColor: "black",
           display: "flex",
