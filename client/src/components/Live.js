@@ -27,7 +27,7 @@ export default function Live() {
     const socket = socketIOClient(ENDPOINT, options);
     socket.connect();
     socket.on("connect_error", () => {
-      console.log("接続に失敗しました");
+      console.log("connect_error");
       socket.connect();
     });
     socket.on("FromAPI", (data) => {
