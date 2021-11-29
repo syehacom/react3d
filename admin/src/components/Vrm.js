@@ -193,8 +193,6 @@ export default function Vrm() {
       riggedFace.head.y
     );
     Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
-    console.log(riggedFace.eye.l);
-    // Blendshape.setValue(PresetName.Blink, riggedFace.eye.r);
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
       PresetName.I,

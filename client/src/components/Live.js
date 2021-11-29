@@ -19,7 +19,6 @@ export default function Live() {
   //socket.io
   const ENDPOINT = process.env.REACT_APP_SERVER;
   const [response, setResponse] = useState("");
-  const [blink, setBlink] = useState(0)
 
   useEffect(() => {
     const options = {
@@ -45,6 +44,9 @@ export default function Live() {
   const canvasRef = useRef(null);
 
   const lerp = Vector.lerp;
+  const clamp = (val, min, max) => {
+    return Math.max(Math.min(val, max), min);
+  };
 
   // VRM
   useEffect(() => {
@@ -178,7 +180,21 @@ export default function Live() {
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
-    Blendshape.setValue(PresetName.Blink, 1);
+    riggedFace.eye.l = lerp(
+      clamp(1 - riggedFace.eye.l, 0, 1),
+      Blendshape.getValue(PresetName.Blink),
+      0.5
+    );
+    riggedFace.eye.r = lerp(
+      clamp(1 - riggedFace.eye.r, 0, 1),
+      Blendshape.getValue(PresetName.Blink),
+      0.5
+    );
+    riggedFace.eye = Kalidokit.Face.stabilizeBlink(
+      riggedFace.eye,
+      riggedFace.head.y
+    );
+    Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
       PresetName.I,
