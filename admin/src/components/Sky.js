@@ -102,6 +102,7 @@ export default function Vrm(roomId) {
       {live ? (
         <button
           style={{
+            zIndex: "1",
             border: "1px solid #ccc",
             top: "10px",
             height: "25px",
@@ -115,6 +116,7 @@ export default function Vrm(roomId) {
       ) : (
         <button
           style={{
+            zIndex: "1",
             border: "1px solid #ccc",
             top: "10px",
             height: "25px",

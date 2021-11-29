@@ -57,6 +57,12 @@ export default function Live() {
   const Inputs = ({ onFileChange }) => (
     <label
       style={{
+        zIndex: "1",
+        border: "1px solid #ccc",
+        top: "10px",
+        height: "25px",
+        width: "110px",
+        position: "absolute",
         marginTop: "50px",
       }}
     >
