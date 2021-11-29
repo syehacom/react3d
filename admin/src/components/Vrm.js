@@ -14,7 +14,7 @@ import * as THREE from "three";
 import { Vector3 } from "three";
 import {
   Holistic,
-  FACEMESH_TESSELATION,
+  // FACEMESH_TESSELATION,
   POSE_CONNECTIONS,
   HAND_CONNECTIONS,
 } from "@mediapipe/holistic";
@@ -234,38 +234,67 @@ export default function Vrm() {
     if (!vrm) {
       return;
     }
+    if (results.faceLandmarks) {
+      results.faceLandmarksZ = {
+        21: results.faceLandmarks[21],
+        251: results.faceLandmarks[251],
+        397: results.faceLandmarks[397],
+        172: results.faceLandmarks[172],
+        133: results.faceLandmarks[133],
+        362: results.faceLandmarks[362],
+        130: results.faceLandmarks[130],
+        263: results.faceLandmarks[263],
+        13: results.faceLandmarks[13],
+        14: results.faceLandmarks[14],
+        61: results.faceLandmarks[61],
+        291: results.faceLandmarks[291],
+      };
+    }
+    results.poseLandmarkZ = {
+      11: results.poseLandmark[11],
+      15: results.poseLandmark[15],
+      16: results.poseLandmark[16],
+      23: results.poseLandmark[23],
+      24: results.poseLandmark[24],
+    };
     delete results.faceLandmarks;
-    console.log(results)
+    delete results.poseLandmarks;
+    delete results.image;
+    delete results.multiFaceGeometry;
+
+    console.log(results);
+
     if (socket !== undefined) {
       socket.emit("FromAPI", results);
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand;
-
-    const faceLandmarks = results.faceLandmarks;
+    // const faceLandmarks = results.faceLandmarks
+    const faceLandmarks = results.faceLandmarksZ;
     // Pose 3D Landmarks are with respect to Hip distance in meters
     const pose3DLandmarks = results.ea;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
-    const pose2DLandmarks = results.poseLandmarks;
+    const pose2DLandmarks = results.poseLandmarksZ;
     // Be careful, hand landmarks may be reversed
     const leftHandLandmarks = results.rightHandLandmarks;
     const rightHandLandmarks = results.leftHandLandmarks;
 
     // Animate Face
-    // if (faceLandmarks) {
-    //   rigFace(Kalidokit.Face.solve(faceLandmarks), {
-    //     runtime: "mediapipe",
-    //     video: canvasRef,
-    //     smoothBlink: true, // smooth left and right eye blink delays
-    //     blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
-    //   });
-    // }
+    if (faceLandmarks) {
+      rigFace(Kalidokit.Face.solve(faceLandmarks), {
+        runtime: "mediapipe",
+        video: canvasRef,
+        smoothBlink: true, // smooth left and right eye blink delays
+        blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
+      });
+    }
 
     // Animate Pose
     if (pose2DLandmarks && pose3DLandmarks) {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
         video: canvasRef,
+        enableLegs: false,
       });
       rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
       rigPosition(
@@ -278,15 +307,12 @@ export default function Vrm() {
         1,
         0.07
       );
-
       rigRotation("Chest", riggedPose.Spine, 0.25, 0.3);
       rigRotation("Spine", riggedPose.Spine, 0.45, 0.3);
-
       rigRotation("RightUpperArm", riggedPose.RightUpperArm, 1, 0.3);
       rigRotation("RightLowerArm", riggedPose.RightLowerArm, 1, 0.3);
       rigRotation("LeftUpperArm", riggedPose.LeftUpperArm, 1, 0.3);
       rigRotation("LeftLowerArm", riggedPose.LeftLowerArm, 1, 0.3);
-
       rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg, 1, 0.3);
       rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg, 1, 0.3);
       rigRotation("RightUpperLeg", riggedPose.RightUpperLeg, 1, 0.3);
@@ -391,7 +417,7 @@ export default function Vrm() {
         },
       });
       holistic.setOptions({
-        modelComplexity: 1,
+        modelComplexity: 0,
         smoothLandmarks: true,
         minDetectionConfidence: 0.7,
         minTrackingConfidence: 0.7,
@@ -432,21 +458,21 @@ export default function Vrm() {
       color: "#ff0364",
       lineWidth: 2,
     });
-    drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {
-      color: "#C0C0C070",
-      lineWidth: 1,
-    });
-    if (results.faceLandmarks && results.faceLandmarks.length === 478) {
-      //draw pupils
-      drawLandmarks(
-        ctx,
-        [results.faceLandmarks[468], results.faceLandmarks[468 + 5]],
-        {
-          color: "#ffe603",
-          lineWidth: 2,
-        }
-      );
-    }
+    // drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {
+    //   color: "#C0C0C070",
+    //   lineWidth: 1,
+    // });
+    // if (results.faceLandmarks && results.faceLandmarks.length === 478) {
+    //   //draw pupils
+    //   drawLandmarks(
+    //     ctx,
+    //     [results.faceLandmarks[468], results.faceLandmarks[468 + 5]],
+    //     {
+    //       color: "#ffe603",
+    //       lineWidth: 2,
+    //     }
+    //   );
+    // }
     drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, {
       color: "#eb1064",
       lineWidth: 5,
