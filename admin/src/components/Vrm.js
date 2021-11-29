@@ -33,9 +33,6 @@ export default function Vrm() {
   const canvasRef = useRef(null);
 
   const lerp = Vector.lerp;
-  const clamp = (val, min, max) => {
-    return Math.max(Math.min(val, max), min);
-  };
 
   // VRM
   useEffect(() => {
@@ -169,23 +166,7 @@ export default function Vrm() {
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
-    riggedFace.eye.l = lerp(
-      clamp(1 - riggedFace.eye.l, 0, 1),
-      Blendshape.getValue(PresetName.Blink),
-      0.5
-    );
-    riggedFace.eye.r = lerp(
-      clamp(1 - riggedFace.eye.r, 0, 1),
-      Blendshape.getValue(PresetName.Blink),
-      0.5
-    );
-    riggedFace.eye = Kalidokit.Face.stabilizeBlink(
-      riggedFace.eye,
-      riggedFace.head.y
-    );
-    Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
-    // Blendshape.setValue(PresetName.Blink, riggedFace.eye.r);
-
+    
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
       PresetName.I,
@@ -317,7 +298,6 @@ export default function Vrm() {
         runtime: "mediapipe",
         video: canvasRef,
         smoothBlink: true, // smooth left and right eye blink delays
-        blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
       });
     }
 

@@ -69,8 +69,9 @@ export default function Vrm(roomId) {
           style={{
             zIndex: "1",
             border: "1px solid #ccc",
-            height: "50px",
-            width: "100px",
+            top: "10px",
+            height: "25px",
+            width: "110px",
             position: "absolute",
           }}
           onClick={() => onStart()}
@@ -82,8 +83,9 @@ export default function Vrm(roomId) {
           style={{
             zIndex: "1",
             border: "1px solid #ccc",
-            height: "50px",
-            width: "100px",
+            top: "10px",
+            height: "25px",
+            width: "110px",
             position: "absolute",
           }}
           onClick={() => onEnd()}

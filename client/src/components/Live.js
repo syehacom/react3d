@@ -42,15 +42,22 @@ export default function Live() {
   const canvasRef = useRef(null);
 
   const lerp = Vector.lerp;
-  const clamp = (val, min, max) => {
-    return Math.max(Math.min(val, max), min);
-  };
 
   // VRM
   useEffect(() => {
     loadVRM("/avatar.vrm");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const Inputs = ({ onFileChange }) => (
+    <label
+      style={{
+        marginTop: "50px",
+      }}
+    >
+      <input type="file" accept=".vrm" onChange={onFileChange} />
+    </label>
+  );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -80,6 +87,14 @@ export default function Live() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
+  const handleFileChange = useCallback(
+    async (event) => {
+      const url = URL.createObjectURL(event.target.files[0]);
+      await loadVRM(url);
+      URL.revokeObjectURL(url);
+    },
+    [loadVRM]
+  );
 
   extend({ OrbitControls });
 
@@ -161,22 +176,6 @@ export default function Live() {
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
-    riggedFace.eye.l = lerp(
-      clamp(1 - riggedFace.eye.l, 0, 1),
-      Blendshape.getValue(PresetName.Blink),
-      0.5
-    );
-    riggedFace.eye.r = lerp(
-      clamp(1 - riggedFace.eye.r, 0, 1),
-      Blendshape.getValue(PresetName.Blink),
-      0.5
-    );
-    riggedFace.eye = Kalidokit.Face.stabilizeBlink(
-      riggedFace.eye,
-      riggedFace.head.y
-    );
-    Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
-    // Blendshape.setValue(PresetName.Blink, riggedFace.eye.r);
 
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
@@ -234,7 +233,6 @@ export default function Live() {
         runtime: "mediapipe",
         video: canvasRef,
         smoothBlink: true, // smooth left and right eye blink delays
-        blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
       });
     }
 
@@ -243,6 +241,7 @@ export default function Live() {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
         video: canvasRef,
+        enableLegs: false,
       });
       rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
       rigPosition(
@@ -255,15 +254,12 @@ export default function Live() {
         1,
         0.07
       );
-
       rigRotation("Chest", riggedPose.Spine, 0.25, 0.3);
       rigRotation("Spine", riggedPose.Spine, 0.45, 0.3);
-
       rigRotation("RightUpperArm", riggedPose.RightUpperArm, 1, 0.3);
       rigRotation("RightLowerArm", riggedPose.RightLowerArm, 1, 0.3);
       rigRotation("LeftUpperArm", riggedPose.LeftUpperArm, 1, 0.3);
       rigRotation("LeftLowerArm", riggedPose.LeftLowerArm, 1, 0.3);
-
       rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg, 1, 0.3);
       rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg, 1, 0.3);
       rigRotation("RightUpperLeg", riggedPose.RightUpperLeg, 1, 0.3);
@@ -350,23 +346,15 @@ export default function Live() {
 
   return (
     <>
+      <Inputs onFileChange={handleFileChange} />
       <Canvas camera={{ position: [0, 1, 1] }}>
-        <directionalLight
-          color={0xffffff}
-          position={(1.0, 1.0, 1.0)}
-          intensity={1}
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          castShadow
-        />
+        <directionalLight />
         <Suspense fallback={null}>
           <VRMS vrm={currentVrm} />
         </Suspense>
         <Controls />
-        <>
-          <gridHelper />
-          <axesHelper />
-        </>
+        <gridHelper />
+        <axesHelper />
       </Canvas>
     </>
   );
