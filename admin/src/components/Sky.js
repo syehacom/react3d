@@ -106,7 +106,7 @@ export default function Vrm(roomId) {
             border: "1px solid #ccc",
             top: "10px",
             height: "25px",
-            width: "110px",
+            width: "10%",
             position: "absolute",
           }}
           onClick={() => onStart()}
@@ -120,7 +120,7 @@ export default function Vrm(roomId) {
             border: "1px solid #ccc",
             top: "10px",
             height: "25px",
-            width: "110px",
+            width: "10%",
             position: "absolute",
           }}
           onClick={() => onEnd()}
