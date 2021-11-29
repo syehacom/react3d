@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
     if (interval) {
       clearInterval(interval);
     }
-    interval = setInterval(() => io.emit("FromAPI", data), 30);
+    interval = setInterval(() => io.emit("FromAPI", data), 1000 / 60);
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
