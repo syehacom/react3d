@@ -27,12 +27,18 @@ import socketIOClient from "socket.io-client";
 export default function Vrm() {
   //socket.io
   const ENDPOINT = process.env.REACT_APP_SERVER;
-  const socket = socketIOClient(ENDPOINT);
+  const options = {
+    transports: ["websocket", "polling"],
+  };
+  const socket = socketIOClient(ENDPOINT, options);
 
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
   const lerp = Vector.lerp;
+  const clamp = (val, min, max) => {
+    return Math.max(Math.min(val, max), min);
+  };
 
   // VRM
   useEffect(() => {
@@ -40,15 +46,21 @@ export default function Vrm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const Inputs = ({ onFileChange }) => (
-  //     <label
-  //       style={{
-  //         marginTop: "50px",
-  //       }}
-  //     >
-  //       <input type="file" accept=".vrm" onChange={onFileChange} />
-  //     </label>
-  // );
+  const Inputs = ({ onFileChange }) => (
+    <label
+      style={{
+        zIndex: "1",
+        border: "1px solid #ccc",
+        top: "10px",
+        height: "25px",
+        width: "110px",
+        position: "absolute",
+        marginTop: "50px",
+      }}
+    >
+      <input type="file" accept=".vrm" onChange={onFileChange} />
+    </label>
+  );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -78,14 +90,14 @@ export default function Vrm() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  // const handleFileChange = useCallback(
-  //   async (event) => {
-  //     const url = URL.createObjectURL(event.target.files[0]);
-  //     await loadVRM(url);
-  //     URL.revokeObjectURL(url);
-  //   },
-  //   [loadVRM]
-  // );
+  const handleFileChange = useCallback(
+    async (event) => {
+      const url = URL.createObjectURL(event.target.files[0]);
+      await loadVRM(url);
+      URL.revokeObjectURL(url);
+    },
+    [loadVRM]
+  );
 
   extend({ OrbitControls });
 
@@ -166,7 +178,23 @@ export default function Vrm() {
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
-    
+    riggedFace.eye.l = lerp(
+      clamp(1 - riggedFace.eye.l, 0, 1),
+      Blendshape.getValue(PresetName.Blink),
+      0.5
+    );
+    riggedFace.eye.r = lerp(
+      clamp(1 - riggedFace.eye.r, 0, 1),
+      Blendshape.getValue(PresetName.Blink),
+      0.5
+    );
+    riggedFace.eye = Kalidokit.Face.stabilizeBlink(
+      riggedFace.eye,
+      riggedFace.head.y
+    );
+    Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
+    console.log(riggedFace.eye.l);
+    // Blendshape.setValue(PresetName.Blink, riggedFace.eye.r);
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
       PresetName.I,
@@ -221,6 +249,47 @@ export default function Vrm() {
         14: results.faceLandmarks[14],
         61: results.faceLandmarks[61],
         291: results.faceLandmarks[291],
+        // eye
+        160: results.faceLandmarks[160],
+        159: results.faceLandmarks[159],
+        158: results.faceLandmarks[158],
+        144: results.faceLandmarks[144],
+        145: results.faceLandmarks[145],
+        153: results.faceLandmarks[153],
+        387: results.faceLandmarks[387],
+        386: results.faceLandmarks[386],
+        385: results.faceLandmarks[385],
+        373: results.faceLandmarks[373],
+        374: results.faceLandmarks[374],
+        380: results.faceLandmarks[380],
+        //brow
+        35: results.faceLandmarks[35],
+        244: results.faceLandmarks[244],
+        63: results.faceLandmarks[63],
+        105: results.faceLandmarks[105],
+        66: results.faceLandmarks[66],
+        229: results.faceLandmarks[229],
+        230: results.faceLandmarks[230],
+        231: results.faceLandmarks[231],
+        265: results.faceLandmarks[265],
+        464: results.faceLandmarks[464],
+        293: results.faceLandmarks[293],
+        334: results.faceLandmarks[334],
+        296: results.faceLandmarks[296],
+        449: results.faceLandmarks[449],
+        450: results.faceLandmarks[450],
+        451: results.faceLandmarks[451],
+        //pupil
+        468: results.faceLandmarks[468],
+        469: results.faceLandmarks[469],
+        470: results.faceLandmarks[470],
+        471: results.faceLandmarks[471],
+        472: results.faceLandmarks[472],
+        473: results.faceLandmarks[473],
+        474: results.faceLandmarks[474],
+        475: results.faceLandmarks[475],
+        476: results.faceLandmarks[476],
+        477: results.faceLandmarks[477],
       };
     }
     if (results.ea) {
@@ -505,9 +574,7 @@ export default function Vrm() {
 
   return (
     <>
-      {/* <Inputs
-        onFileChange={handleFileChange}
-      /> */}
+      <Inputs onFileChange={handleFileChange} />
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}

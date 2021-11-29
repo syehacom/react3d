@@ -63,7 +63,7 @@ export default function Vrm(roomId) {
     });
   };
   return (
-    <div>
+    <>
       {live ? (
         <button
           style={{
@@ -94,7 +94,7 @@ export default function Vrm(roomId) {
         </button>
       )}
       {castVideo()}
-    </div>
+    </>
   );
 }
 

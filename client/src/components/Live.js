@@ -19,9 +19,13 @@ export default function Live() {
   //socket.io
   const ENDPOINT = process.env.REACT_APP_SERVER;
   const [response, setResponse] = useState("");
+  const [blink, setBlink] = useState(0)
 
   useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
+    const options = {
+      transports: ["websocket", "polling"],
+    };
+    const socket = socketIOClient(ENDPOINT, options);
     socket.connect();
     socket.on("connect_error", () => {
       console.log("接続に失敗しました");
@@ -32,7 +36,6 @@ export default function Live() {
         setResponse(data);
       }
     });
-
     // Animate model
     animateVRM(currentVrm, response);
     return () => socket.disconnect();
@@ -49,15 +52,15 @@ export default function Live() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const Inputs = ({ onFileChange }) => (
-  //   <label
-  //     style={{
-  //       marginTop: "50px",
-  //     }}
-  //   >
-  //     <input type="file" accept=".vrm" onChange={onFileChange} />
-  //   </label>
-  // );
+  const Inputs = ({ onFileChange }) => (
+    <label
+      style={{
+        marginTop: "50px",
+      }}
+    >
+      <input type="file" accept=".vrm" onChange={onFileChange} />
+    </label>
+  );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -87,14 +90,14 @@ export default function Live() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  // const handleFileChange = useCallback(
-  //   async (event) => {
-  //     const url = URL.createObjectURL(event.target.files[0]);
-  //     await loadVRM(url);
-  //     URL.revokeObjectURL(url);
-  //   },
-  //   [loadVRM]
-  // );
+  const handleFileChange = useCallback(
+    async (event) => {
+      const url = URL.createObjectURL(event.target.files[0]);
+      await loadVRM(url);
+      URL.revokeObjectURL(url);
+    },
+    [loadVRM]
+  );
 
   extend({ OrbitControls });
 
@@ -115,7 +118,6 @@ export default function Live() {
   };
 
   // Animate Rotation Helper function
-
   const rigRotation = (
     name,
     rotation = { x: 0, y: 0, z: 0 },
@@ -176,7 +178,7 @@ export default function Live() {
     const PresetName = VRMSchema.BlendShapePresetName;
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
-
+    Blendshape.setValue(PresetName.Blink, 1);
     // Interpolate and set mouth blendshapes
     Blendshape.setValue(
       PresetName.I,
@@ -218,7 +220,7 @@ export default function Live() {
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand;
 
-    const faceLandmarks = response.faceLandmarks;
+    const faceLandmarks = response.faceLandmarksZ;
     // Pose 3D Landmarks are with respect to Hip distance in meters
     const pose3DLandmarks = response.ea;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
@@ -346,7 +348,7 @@ export default function Live() {
 
   return (
     <>
-      {/* <Inputs onFileChange={handleFileChange} /> */}
+      <Inputs onFileChange={handleFileChange} />
       <Canvas camera={{ position: [0, 1, 1] }}>
         <directionalLight />
         <Suspense fallback={null}>
