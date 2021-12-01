@@ -17,7 +17,9 @@ import socketIOClient from "socket.io-client";
 
 export default function Live() {
   //socket.io
-  const ENDPOINT = process.env.REACT_APP_SERVER;
+  const ENDPOINT = "https://react3d.azurewebsites.net";
+  // const ENDPOINT = process.env.REACT_APP_SERVER;
+  // const ENDPOINT = "http://localhost:3001";
   const [response, setResponse] = useState("");
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function Live() {
     socket.on("FromAPI", (data) => {
       if (data) {
         setResponse(data);
+        console.log(response);
       }
     });
     // Animate model
@@ -117,7 +120,7 @@ export default function Live() {
       <orbitControls
         ref={controls}
         args={[camera, gl.domElement]}
-        zoomSpeed={0}
+        zoomSpeed={0.2}
         enableDamping
         dampingFactor={0.2}
         target={new Vector3(0, 0, 0)}
@@ -238,6 +241,56 @@ export default function Live() {
   const animateVRM = (vrm, response) => {
     if (!vrm) {
       return;
+    }
+    if (response.ea) {
+      delete response.ea[0];
+      delete response.ea[1];
+      delete response.ea[2];
+      delete response.ea[3];
+      delete response.ea[4];
+      delete response.ea[5];
+      delete response.ea[6];
+      delete response.ea[7];
+      delete response.ea[8];
+      delete response.ea[9];
+      delete response.ea[10];
+      delete response.ea[21];
+      delete response.ea[22];
+      delete response.ea[29];
+      delete response.ea[30];
+      delete response.ea[31];
+      delete response.ea[32];
+      delete response.ea[33];
+    }
+    if (response.poseLandmarks) {
+      delete response.poseLandmarks[0];
+      delete response.poseLandmarks[1];
+      delete response.poseLandmarks[2];
+      delete response.poseLandmarks[3];
+      delete response.poseLandmarks[4];
+      delete response.poseLandmarks[5];
+      delete response.poseLandmarks[6];
+      delete response.poseLandmarks[7];
+      delete response.poseLandmarks[8];
+      delete response.poseLandmarks[9];
+      delete response.poseLandmarks[10];
+      delete response.poseLandmarks[13];
+      delete response.poseLandmarks[14];
+      delete response.poseLandmarks[17];
+      delete response.poseLandmarks[18];
+      delete response.poseLandmarks[19];
+      delete response.poseLandmarks[20];
+      delete response.poseLandmarks[21];
+      delete response.poseLandmarks[22];
+      delete response.poseLandmarks[25];
+      delete response.poseLandmarks[26];
+      delete response.poseLandmarks[27];
+      delete response.poseLandmarks[28];
+      delete response.poseLandmarks[29];
+      delete response.poseLandmarks[30];
+      delete response.poseLandmarks[31];
+      delete response.poseLandmarks[32];
+      delete response.poseLandmarks[33];
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand;
@@ -370,7 +423,7 @@ export default function Live() {
 
   return (
     <>
-      <Canvas style={{ zIndex: "1" }} camera={{ position: [0, 1, 1] }}>
+      <Canvas camera={{ position: [0, 1, 1] }}>
         <directionalLight />
         <Suspense fallback={null}>
           <VRMS vrm={currentVrm} />

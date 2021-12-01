@@ -128,11 +128,11 @@ export default function Vrm(roomId) {
           音声オフ
         </button>
       )}
-      <video
+      {/* <video
         style={{ width: "0px", height: "0px" }}
         ref={localVideoRef}
         playsInline
-      ></video>
+      ></video> */}
       {/* {castVideo()} */}
     </>
   );

@@ -26,7 +26,9 @@ import socketIOClient from "socket.io-client";
 
 export default function Vrm() {
   //socket.io
-  const ENDPOINT = process.env.REACT_APP_SERVER;
+  const ENDPOINT = "https://react3d.azurewebsites.net";
+  // const ENDPOINT = process.env.REACT_APP_SERVER;
+  // const ENDPOINT = "http://localhost:3001";
   const options = {
     transports: ["websocket", "polling"],
   };
@@ -42,7 +44,7 @@ export default function Vrm() {
 
   // VRM
   useEffect(() => {
-    loadVRM("/avatar.vrm");
+    loadVRM("/animal.vrm");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -345,6 +347,7 @@ export default function Vrm() {
     delete results.multiFaceGeometry;
 
     if (socket !== undefined) {
+      console.log(results);
       socket.emit("FromAPI", results);
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
