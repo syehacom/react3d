@@ -17,16 +17,12 @@ import socketIOClient from "socket.io-client";
 
 export default function Live() {
   //socket.io
-  const ENDPOINT = "https://react3d.azurewebsites.net";
-  // const ENDPOINT = process.env.REACT_APP_SERVER;
-  // const ENDPOINT = "http://localhost:3001";
+  const ENDPOINT = process.env.REACT_APP_SERVER;
+  // const ENDPOINT = "http://localhost:3000";
   const [response, setResponse] = useState("");
 
   useEffect(() => {
-    const options = {
-      transports: ["websocket", "polling"],
-    };
-    const socket = socketIOClient(ENDPOINT, options);
+    const socket = socketIOClient(ENDPOINT);
     socket.connect();
     socket.on("connect_error", () => {
       console.log("connect_error");
@@ -57,22 +53,6 @@ export default function Live() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const Inputs = ({ onFileChange }) => (
-    <label
-      style={{
-        zIndex: "1",
-        border: "1px solid #ccc",
-        top: "10px",
-        height: "25px",
-        width: "110px",
-        position: "absolute",
-        marginTop: "50px",
-      }}
-    >
-      <input type="file" accept=".vrm" onChange={onFileChange} />
-    </label>
-  );
-
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
       if (vrm) {
@@ -101,15 +81,7 @@ export default function Live() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  const handleFileChange = useCallback(
-    async (event) => {
-      const url = URL.createObjectURL(event.target.files[0]);
-      await loadVRM(url);
-      URL.revokeObjectURL(url);
-    },
-    [loadVRM]
-  );
-
+  
   extend({ OrbitControls });
 
   const Controls = () => {

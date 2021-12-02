@@ -18,13 +18,12 @@ import socketIOClient from "socket.io-client";
 export default function Live() {
   //socket.io
   const ENDPOINT = process.env.REACT_APP_SERVER;
+  // const ENDPOINT = "http://localhost:3000";
+
   const [response, setResponse] = useState("");
 
   useEffect(() => {
-    const options = {
-      transports: ["websocket", "polling"],
-    };
-    const socket = socketIOClient(ENDPOINT, options);
+    const socket = socketIOClient(ENDPOINT);
     socket.connect();
     socket.on("connect_error", () => {
       console.log("connect_error");

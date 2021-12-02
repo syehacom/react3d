@@ -26,13 +26,9 @@ import socketIOClient from "socket.io-client";
 
 export default function Vrm() {
   //socket.io
-  const ENDPOINT = "https://react3d.azurewebsites.net";
-  // const ENDPOINT = process.env.REACT_APP_SERVER;
-  // const ENDPOINT = "http://localhost:3001";
-  const options = {
-    transports: ["websocket", "polling"],
-  };
-  const socket = socketIOClient(ENDPOINT, options);
+  const ENDPOINT = process.env.REACT_APP_SERVER;
+  // const ENDPOINT = "http://localhost:3000";
+  const socket = socketIOClient(ENDPOINT);
 
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);

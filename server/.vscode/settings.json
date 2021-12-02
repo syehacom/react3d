@@ -1,4 +1,0 @@
-{
-  "appService.defaultWebAppToDeploy": "/subscriptions/d81c5ed7-8e37-4946-9dd2-18a1760b842d/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/react3d",
-  "appService.deploySubpath": "."
-}
