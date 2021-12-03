@@ -1,0 +1,13 @@
+[debug] [2021-12-03T03:19:49.548Z] ----------------------------------------------------------------------
+[debug] [2021-12-03T03:19:49.556Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\KENSHI\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2021-12-03T03:19:49.558Z] CLI Version:   9.23.0
+[debug] [2021-12-03T03:19:49.558Z] Platform:      win32
+[debug] [2021-12-03T03:19:49.558Z] Node Version:  v16.2.0
+[debug] [2021-12-03T03:19:49.564Z] Time:          Fri Dec 03 2021 12:19:49 GMT+0900 (日本標準時)
+[debug] [2021-12-03T03:19:49.565Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2021-12-03T03:19:49.696Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-12-03T03:19:49.697Z] > authorizing via signed-in user (kenshicaster@gmail.com)
+[debug] [2021-12-03T03:19:49.697Z] [iam] checking project react3d-3e947 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2021-12-03T03:19:49.701Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/react3d-3e947:testIamPermissions  
+ {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
