@@ -1,14 +1,11 @@
-import "./index.css";
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
-import { ColorsContextProvider } from "./contexts/ColorsContext";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
 
 ReactDOM.render(
   <React.StrictMode>
-      <ColorsContextProvider>
-        <App />
-      </ColorsContextProvider>
+    <App />
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );

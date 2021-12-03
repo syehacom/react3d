@@ -1,34 +1,15 @@
-import React from "react";
-import Sky from "./components/Sky";
-import Live from "./components/Live";
+import logo from './logo.svg';
+import Live from "./components/Live"
 
-export default function App() {
+function App() {
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          height: "100%",
-          width: "100%",
-          backgroundColor: "black",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <Sky />
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
         <Live />
-      </div>
+      </header>
     </div>
   );
 }
+
+export default App;

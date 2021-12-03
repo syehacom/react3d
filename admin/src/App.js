@@ -1,6 +1,6 @@
 import React from "react";
 import Vrm from "./components/Vrm";
-import Sky from "./components/Sky";
+// import Sky from "./components/Sky";
 
 export default function App() {
   return (
@@ -26,7 +26,7 @@ export default function App() {
           flexDirection: "row",
         }}
       >
-        <Sky />
+        {/* <Sky /> */}
         <Vrm />
       </div>
     </div>
