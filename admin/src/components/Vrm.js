@@ -26,8 +26,7 @@ import socketIOClient from "socket.io-client";
 
 export default function Vrm() {
   //socket.io
-  const ENDPOINT = "server.syeha.com";
-  // const ENDPOINT = process.env.REACT_APP_SERVER;
+  const ENDPOINT = process.env.REACT_APP_SERVER;
   // const ENDPOINT = "http://localhost:3000";
   const socket = socketIOClient(ENDPOINT);
 
