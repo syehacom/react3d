@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "threetest",
-    "slug": "threetest",
+    "name": "expo3d",
+    "slug": "expo3d",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,9 +17,6 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     }
   }
 }
