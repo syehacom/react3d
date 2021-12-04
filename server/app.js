@@ -22,14 +22,23 @@ const io = socketIO(server, {
 
 app.use(cors());
 
+let interval;
+
 io.on("connection", (socket) => {
-  let interval;
-  socket.on("FromAPI", (data) => {
-    io.emit("FromAPI", data);
-  });
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
+  if (interval) {
+    clearInterval(interval);
+  }
+  setInterval(
+    () =>
+      socket.on("FromAPI", (data) => {
+        io.emit("FromAPI", data);
+        socket.on("disconnect", () => {
+          console.log("Client disconnected");
+          clearInterval(interval);
+        });
+      }),
+    2000
+  );
 });
 
 server.listen(port, () => {
