@@ -12,29 +12,21 @@ import {
   BoxGeometry,
   MeshLambertMaterial,
 } from "three";
-import Stick from "./Stick";
+import Positon from "./Position";
 
 export default function App() {
-  const camera = new PerspectiveCamera(30, 1, 1, 100); // カメラが映し出す設定(視野角, アスペクト比, near, far)
-  const [lr, setLr] = useState(0);
-  const [ud, setUd] = useState(0);
-
-  // カメラの初期座標
-  let cameraInitialPositionX = 0;
-  let cameraInitialPositionY = 2;
-  let cameraInitialPositionZ = 7;
+  const [cameras, setCameras] = useState();
+  const [cubes, setCubes] = useState();
 
   // TweenMax.to(何が, 何秒で, { z軸に distance 分移動 })
-  const moveUd = (distance) => {
-    TweenMax.to(camera.position, 0.1, {
-      z: camera.position.z + distance,
+  const move = (distance) => {
+    TweenMax.to(cubes.position, 0.1, {
+      z: cubes.position.z + distance.y,
+      x: cubes.position.x + distance.x,
     });
-  };
-
-  //TweenMax.to(何が, 何秒で, { x軸に distance 分移動 })
-  const moveLr = (distance) => {
-    TweenMax.to(camera.position, 0.1, {
-      x: camera.position.x + distance,
+    TweenMax.to(cameras.position, 0.1, {
+      z: cameras.position.z + distance.y,
+      x: cameras.position.x + distance.x,
     });
   };
 
@@ -57,19 +49,38 @@ export default function App() {
             const geometry = new BoxGeometry(2, 2, 2); // 四角い物体
             const material = new MeshLambertMaterial({ color: "blue" }); // 物体に光を反射させ色や影を表現する
             cube = new Mesh(geometry, material); // geometryとmaterialでオブジェクト完成
-            cube.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+            cube.position.set(0, 1, 0); // 配置される座標 (x,y,z)
             scene.add(cube); // 3D空間に追加
+            setCubes(cube);
 
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
             scene.add(pointLight); //3D空間に追加
 
+            // カメラが映し出す設定(視野角, アスペクト比, near, far)
+            const camera = new PerspectiveCamera(45, width / height, 1, 1000);
+            setCameras(camera);
+            // カメラの初期座標
+            let cameraInitialPositionX = 0;
+            let cameraInitialPositionY = 2;
+            let cameraInitialPositionZ = 7;
+
             // カメラの座標　＝　一人称視点
             camera.position.set(
               cameraInitialPositionX,
               cameraInitialPositionY,
               cameraInitialPositionZ
+            );
+
+            let cameraInitialRotationX = 0;
+            let cameraInitialRotationY = 0;
+            let cameraInitialRotationZ = 0;
+
+            camera.rotation.set(
+              cameraInitialRotationX,
+              cameraInitialRotationY,
+              cameraInitialRotationZ
             );
 
             const render = () => {
@@ -81,10 +92,10 @@ export default function App() {
           }}
         />
       </View>
-      <View style={{ alignItems: "center" }}>
-        <Stick
+      <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        <Positon
           onMove={(data) => {
-           console.log(data)
+            move({ x: (data.x - 60) / 1000, y: (data.y - 60) / 1000 });
           }}
         />
       </View>
