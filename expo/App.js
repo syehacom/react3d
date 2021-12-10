@@ -13,6 +13,7 @@ import {
   MeshLambertMaterial,
 } from "three";
 import Positon from "./Position";
+import { WebView } from "react-native-webview";
 
 export default function App() {
   const [cameras, setCameras] = useState();
@@ -32,7 +33,11 @@ export default function App() {
 
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <WebView
+        style={{ flex: 1 }}
+        source={{ uri: "https://react3d-3e947.web.app/" }}
+      />
+      {/* <View style={{ flex: 1 }}>
         <GLView
           style={{ flex: 1 }}
           onContextCreate={async (gl) => {
@@ -98,7 +103,7 @@ export default function App() {
             move({ x: (data.x - 60) / 1000, y: (data.y - 60) / 1000 });
           }}
         />
-      </View>
+      </View> */}
     </>
   );
 }
