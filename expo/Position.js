@@ -13,68 +13,44 @@ export default function Stick(props) {
   const handleTouchMove = (e) => {
     const touchX = e.nativeEvent.locationX; // 画面をタッチしたときのx座標
     const touchY = e.nativeEvent.locationY; // 画面をタッチしたときのy座標
-    // タッチした座標から小さい円の半径を差し引いた外周の座標
+    // タッチした座標から小さい円の半径を差し引いた円の中心の座標
     let coordinates = {
       x: touchX - smallRadius,
       y: touchY - smallRadius,
     };
 
     let angle =
-      // atan2でラジアンを算出し角度を計算し角度に変換
-      Math.atan2(largeRadius - touchY, largeRadius - touchX) * (180 / Math.PI);
-
-    // 大きい円の半径と座標と斜辺のうち小さい値を返す
+      // atan2でラジアンを算出する
+      Math.atan2(touchY, touchX);
+    console.log(angle)
+    // 原点から座標の距離と大きい円の半径のうち小さい値を返す
     let minDist = Math.min(
-      Math.hypot(touchX - largeRadius, touchY - largeRadius), // 座標間の距離
+      Math.hypot(touchX - smallRadius, touchY - smallRadius), // 原点からのの距離
       largeRadius
     );
-    // 半径と斜辺が同じとき＝大きい円と小さい円の外周が接しているとき
+    // 大きい円と小さい円の中心が接している座標を算出
+    // ラジアンからコサインを算出し、大きい円の半径と乗算し座標を算出する
     if (minDist === largeRadius) {
-      if (angle < 0) {
-        // -の場合Math.absで絶対数を取得、角度からラジアンに変換、正のx軸の間
-        let rad =
-          largeRadius -
-          smallRadius +
-          minDist * Math.cos((180 - Math.abs(angle)) * (Math.PI / 180));
-        setX(
-          largeRadius - smallRadius + minDist * Math.cos(rad * (Math.PI / 180))
-        );
-        setY(
-          largeRadius - smallRadius + minDist * Math.sin(rad * (Math.PI / 180))
-        );
+      // ラジアンがマイナスの時
+      // if (angle < 0) {
+      //   setX(largeRadius * Math.cos(angle) - smallRadius); 
+      //   setY(largeRadius * Math.sin(angle) - smallRadius);
+      //   onMove({
+      //     x: x,
+      //     y: y,
+      //   });
+      // } else {
+        // ラジアンがプラスの時
+        setX(largeRadius * Math.cos(angle) - smallRadius);
+        setY(largeRadius * Math.sin(angle) - smallRadius);
         onMove({
           x: x,
           y: y,
         });
-        console.log({
-          angle,
-          rad,
-          x: x,
-          y: y,
-        });
-      } else {
-        let rad =
-          largeRadius -
-          smallRadius +
-          minDist * Math.cos((angle + 180) * (Math.PI / 180));
-        setX(
-          largeRadius - smallRadius + minDist * Math.cos(rad * (Math.PI / 180))
-        );
-        setY(
-          largeRadius - smallRadius + minDist * Math.sin(rad * (Math.PI / 180))
-        );
-        onMove({
-          x: x,
-          y: y,
-        });
-        console.log({
-          x: x,
-          y: y,
-        });
-      }
+      // }
     } else {
-      setX(Math.min(120, Math.max(0, coordinates.x)));
-      setY(Math.min(120, Math.max(0, coordinates.y)));
+      setX(coordinates.x);
+      setY(coordinates.y);
       onMove({ x: x, y: y });
     }
   };
@@ -98,7 +74,6 @@ export default function Stick(props) {
             height: 2 * largeRadius,
             borderRadius: largeRadius,
             backgroundColor: "black",
-            // transform: [{ rotateX: "180deg" }],
           }}
         >
           <View
