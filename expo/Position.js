@@ -18,41 +18,17 @@ export default function Stick(props) {
       x: touchX - smallRadius,
       y: touchY - smallRadius,
     };
-
-    let angle =
-      // atan2でラジアンを算出する
-      Math.atan2(touchY, touchX);
-    console.log(angle)
-    // 原点から座標の距離と大きい円の半径のうち小さい値を返す
-    let minDist = Math.min(
-      Math.hypot(touchX - smallRadius, touchY - smallRadius), // 原点からのの距離
-      largeRadius
-    );
+    // atan2でラジアンを算出する
+    const angle = Math.atan2(touchY, touchX);
     // 大きい円と小さい円の中心が接している座標を算出
     // ラジアンからコサインを算出し、大きい円の半径と乗算し座標を算出する
-    if (minDist === largeRadius) {
-      // ラジアンがマイナスの時
-      // if (angle < 0) {
-      //   setX(largeRadius * Math.cos(angle) - smallRadius); 
-      //   setY(largeRadius * Math.sin(angle) - smallRadius);
-      //   onMove({
-      //     x: x,
-      //     y: y,
-      //   });
-      // } else {
-        // ラジアンがプラスの時
-        setX(largeRadius * Math.cos(angle) - smallRadius);
-        setY(largeRadius * Math.sin(angle) - smallRadius);
-        onMove({
-          x: x,
-          y: y,
-        });
-      // }
-    } else {
-      setX(coordinates.x);
-      setY(coordinates.y);
-      onMove({ x: x, y: y });
-    }
+    let limitX = largeRadius - smallRadius + largeRadius * Math.cos(angle);
+    let limitY = largeRadius - smallRadius + largeRadius * Math.sin(angle);
+    // タッチした座標と大きい円の座標の小さい値をx座標、y座標にセットする
+    setX(Math.min(coordinates.x, limitX));
+    setY(Math.min(coordinates.y, limitY));
+    onMove({ x: x, y: y });
+    console.log({ type: `値${coordinates.x}:${limitX}`, x: x, y: y });
   };
 
   const handleTouchEnd = () => {
