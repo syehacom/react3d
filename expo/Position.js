@@ -13,73 +13,69 @@ export default function Stick(props) {
   const handleTouchMove = (e) => {
     const touchX = e.nativeEvent.locationX; // 画面をタッチしたときのx座標
     const touchY = e.nativeEvent.locationY; // 画面をタッチしたときのy座標
-    // 小さい円の半径を差し引く
+    // タッチした座標から小さい円の半径を差し引いた外周の座標
     let coordinates = {
       x: touchX - smallRadius,
       y: touchY - smallRadius,
     };
 
-    let rawAngle =
+    let angle =
+      // atan2でラジアンを算出し角度を計算し角度に変換
       Math.atan2(largeRadius - touchY, largeRadius - touchX) * (180 / Math.PI);
 
+    // 大きい円の半径と座標と斜辺のうち小さい値を返す
     let minDist = Math.min(
-      // 引数のうち小さい値を返す
       Math.hypot(touchX - largeRadius, touchY - largeRadius), // 座標間の距離
       largeRadius
     );
-
+    // 半径と斜辺が同じとき＝大きい円と小さい円の外周が接しているとき
     if (minDist === largeRadius) {
-      if (rawAngle < 0) {
-        let angle =
+      if (angle < 0) {
+        // -の場合Math.absで絶対数を取得、角度からラジアンに変換、正のx軸の間
+        let rad =
           largeRadius -
           smallRadius +
-          minDist * Math.cos((180 - Math.abs(rawAngle)) * (Math.PI / 180));
+          minDist * Math.cos((180 - Math.abs(angle)) * (Math.PI / 180));
         setX(
-          largeRadius -
-            smallRadius +
-            minDist * Math.cos(angle * (Math.PI / 180))
+          largeRadius - smallRadius + minDist * Math.cos(rad * (Math.PI / 180))
         );
         setY(
-          largeRadius -
-            smallRadius +
-            minDist * Math.sin(angle * (Math.PI / 180))
+          largeRadius - smallRadius + minDist * Math.sin(rad * (Math.PI / 180))
         );
         onMove({
-          x: Math.min(80, Math.max(-80, x)),
-          y: Math.min(80, Math.max(-80, y)),
+          x: x,
+          y: y,
         });
         console.log({
-          x: Math.min(80, Math.max(-80, x)),
-          y: Math.min(80, Math.max(-80, y)),
+          angle,
+          rad,
+          x: x,
+          y: y,
         });
       } else {
-        let angle =
+        let rad =
           largeRadius -
           smallRadius +
-          minDist * Math.cos((rawAngle + 180) * (Math.PI / 180));
+          minDist * Math.cos((angle + 180) * (Math.PI / 180));
         setX(
-          largeRadius -
-            smallRadius +
-            minDist * Math.cos(angle * (Math.PI / 180))
+          largeRadius - smallRadius + minDist * Math.cos(rad * (Math.PI / 180))
         );
         setY(
-          largeRadius -
-            smallRadius +
-            minDist * Math.sin(angle * (Math.PI / 180))
+          largeRadius - smallRadius + minDist * Math.sin(rad * (Math.PI / 180))
         );
         onMove({
-          x: Math.min(80, Math.max(-80, x)),
-          y: Math.min(80, Math.max(-80, y)),
+          x: x,
+          y: y,
         });
         console.log({
-          x: Math.min(80, Math.max(-80, x)),
-          y: Math.min(80, Math.max(-80, y)),
+          x: x,
+          y: y,
         });
       }
     } else {
-    setX(Math.min(120, Math.max(0, coordinates.x)));
-    setY(Math.min(120, Math.max(0, coordinates.y)));
-    onMove({ x: x, y: y });
+      setX(Math.min(120, Math.max(0, coordinates.x)));
+      setY(Math.min(120, Math.max(0, coordinates.y)));
+      onMove({ x: x, y: y });
     }
   };
 
@@ -98,7 +94,7 @@ export default function Stick(props) {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           style={{
-            width: 2 * largeRadius,
+            width: 2 * largeRadius, // 半径 * 2
             height: 2 * largeRadius,
             borderRadius: largeRadius,
             backgroundColor: "black",
@@ -108,7 +104,7 @@ export default function Stick(props) {
           <View
             pointerEvents="none"
             style={{
-              height: 2 * smallRadius,
+              height: 2 * smallRadius, // 半径 * 2
               width: 2 * smallRadius,
               borderRadius: smallRadius,
               backgroundColor: "blue",
