@@ -16,8 +16,8 @@ import Positon from "./Position";
 import { WebView } from "react-native-webview";
 
 export default function App() {
-  const [cameras, setCameras] = useState();
-  const [cubes, setCubes] = useState();
+  const [cameras, setCameras] = useState(null);
+  const [cubes, setCubes] = useState(null);
 
   // TweenMax.to(何が, 何秒で, { z軸に distance 分移動 })
   const move = (distance) => {
@@ -33,11 +33,11 @@ export default function App() {
 
   return (
     <>
-      <WebView
+      {/* <WebView
         style={{ flex: 1 }}
         source={{ uri: "https://react3d-3e947.web.app/" }}
-      />
-      {/* <View style={{ flex: 1 }}>
+      /> */}
+      <View style={{ flex: 1 }}>
         <GLView
           style={{ flex: 1 }}
           onContextCreate={async (gl) => {
@@ -78,17 +78,9 @@ export default function App() {
               cameraInitialPositionZ
             );
 
-            let cameraInitialRotationX = 0;
-            let cameraInitialRotationY = 0;
-            let cameraInitialRotationZ = 0;
-
-            camera.rotation.set(
-              cameraInitialRotationX,
-              cameraInitialRotationY,
-              cameraInitialRotationZ
-            );
-
             const render = () => {
+              cube.rotation.x += 0.01;
+              cube.rotation.y += 0.01;
               requestAnimationFrame(render); // アニメーション　moveUd関数、moveLr関数でカメラ座標が移動
               renderer.render(scene, camera); // レンダリング
               gl.endFrameEXP(); // 現在のフレームを表示する準備ができていることをコンテキストに通知するpresent (Expo公式)
@@ -103,7 +95,7 @@ export default function App() {
             move({ x: (data.x - 60) / 1000, y: (data.y - 60) / 1000 });
           }}
         />
-      </View> */}
+      </View>
     </>
   );
 }
