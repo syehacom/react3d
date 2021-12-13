@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text } from "react-native";
 
 export default function Stick(props) {
-  const { onMove } = props;
+  const { onMove, onEnd } = props;
 
   const largeRadius = 90; // 大きい円の半径
   const smallRadius = largeRadius / 3; // 小さい円の半径
@@ -19,21 +19,21 @@ export default function Stick(props) {
       y: touchY - smallRadius,
     };
     // atan2でラジアンを算出する
-    const angle = Math.atan2(touchY, touchX);
+    const radian = Math.atan2(y, x);
     // 大きい円と小さい円の中心が接している座標を算出
     // ラジアンからコサインを算出し、大きい円の半径と乗算し座標を算出する
-    let limitX = largeRadius - smallRadius + largeRadius * Math.cos(angle);
-    let limitY = largeRadius - smallRadius + largeRadius * Math.sin(angle);
+    let limitX = largeRadius - smallRadius + largeRadius * Math.cos(radian);
+    let limitY = largeRadius - smallRadius + largeRadius * Math.sin(radian);
     // タッチした座標と大きい円の座標の小さい値をx座標、y座標にセットする
     setX(Math.min(coordinates.x, limitX));
     setY(Math.min(coordinates.y, limitY));
     onMove({ x: x, y: y });
-    console.log({ type: `値${coordinates.x}:${limitX}`, x: x, y: y });
   };
 
   const handleTouchEnd = () => {
     setX(largeRadius - smallRadius);
     setY(largeRadius - smallRadius);
+    onEnd();
   };
 
   return (
