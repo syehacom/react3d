@@ -38,11 +38,12 @@ export default function App() {
     const socket = io("https://vrm.syeha.com/");
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
-        console.log(data);
-        modelsB.position.set(data.x, 0, data.z);
-        modelsB.rotation.y = data.y;
-        walkB.paused = data.w;
-        walkB.play();
+        if (data !== null) {
+          modelsB.position.set(data.x, 0, data.z);
+          modelsB.rotation.y = data.y;
+          walkB.paused = data.w;
+          walkB.play();
+        }
       });
     });
     socket.on("disconnect", () => {
@@ -105,10 +106,9 @@ export default function App() {
 
             // GLTFをロードする
             const loader = new GLTFLoader();
-
+            // 自分のキャラクターを設置
             const assetA = Asset.fromModule(require("./assets/testA.glb"));
             await assetA.downloadAsync();
-
             let mixerA;
             let clockA = new Clock();
             loader.load(
@@ -135,7 +135,7 @@ export default function App() {
                 console.error("読み込めませんでした");
               }
             );
-
+            // 相手のキャラクターを設置
             let mixerB;
             let clockB = new Clock();
             const assetB = Asset.fromModule(require("./assets/testB.glb"));
@@ -185,7 +185,7 @@ export default function App() {
             const render = () => {
               requestAnimationFrame(render); // アニメーション　moveUd関数、moveLr関数でカメラ座標が移動
               renderer.render(scene, camera); // レンダリング
-              //Animation Mixerを実行
+              //Animation Mixerを自分と相手ともに実行
               if (mixerA) {
                 mixerA.update(clockA.getDelta());
               }
