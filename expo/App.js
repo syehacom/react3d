@@ -38,12 +38,12 @@ export default function App() {
     const socket = io("https://vrm.syeha.com/");
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
-        if (data !== null) {
+        if (data.x !== null && data.z !== null) {
           modelsB.position.set(data.x, 0, data.z);
-          modelsB.rotation.y = data.y;
-          walkB.paused = data.w;
-          walkB.play();
         }
+        modelsB.rotation.y = data.y;
+        walkB.paused = data.w;
+        walkB.play();
       });
     });
     socket.on("disconnect", () => {
