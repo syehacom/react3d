@@ -38,7 +38,9 @@ export default function App() {
     const socket = io("https://vrm.syeha.com/");
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
-        if (data.x !== null && data.z !== null) {
+        if (data === null) {
+          modelsB.position.set(0, 0, 0);
+        } else {
           modelsB.position.set(data.x, 0, data.z);
         }
         modelsB.rotation.y = data.y;
