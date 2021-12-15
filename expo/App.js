@@ -37,14 +37,13 @@ export default function App() {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
     if (modelsB !== null)
-    socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
+        console.log(data)
         modelsB.position.set(data.x, 0, data.z);
         modelsB.rotation.y = data.y;
         walkB.paused = data.w;
         walkB.play();
       });
-    });
     socket.on("disconnect", () => {
       console.log("disconnected");
     });
