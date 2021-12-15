@@ -22,7 +22,6 @@ export default function App() {
   const [walkA, setWalkA] = useState(true);
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
-  const [chara, setChara] = useState(false)
   const socketRef = useRef();
 
   const send = (props) => {
@@ -33,7 +32,7 @@ export default function App() {
       w: props.w,
     });
   };
-  
+
   useEffect(() => {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
@@ -54,7 +53,6 @@ export default function App() {
     });
     // models の位置情報をサーバーに送信
     socketRef.current = socket;
-    console.log(socketRef.current.connected);
     return () => socket.disconnect();
   }, [socketRef]);
 
@@ -141,32 +139,31 @@ export default function App() {
             let clockB = new Clock();
             const assetB = Asset.fromModule(require("./assets/testB.glb"));
             await assetB.downloadAsync();
-            if (socketRef.current.connected) {
-              loader.load(
-                assetB.uri || "",
-                (gltf) => {
-                  const modelB = gltf.scene;
-                  modelB.position.set(0, 0, 0); // 配置される座標 (x,y,z)
-                  modelB.rotation.y = Math.PI;
-                  const animations = gltf.animations;
-                  //Animation Mixerインスタンスを生成
-                  mixerB = new AnimationMixer(modelB);
-                  // 設定した一つ目のアニメーションを設定
-                  let animation = animations[0];
-                  // アニメーションを変数walkにセット
-                  setWalkB(mixerB.clipAction(animation));
-                  // test.glbを3D空間に追加;
-                  scene.add(modelB);
-                  setModelsB(modelB);
-                },
-                (xhr) => {
-                  console.log("ロード中");
-                },
-                (error) => {
-                  console.error("読み込めませんでした");
-                }
-              );
-            }
+            loader.load(
+              assetB.uri || "",
+              (gltf) => {
+                const modelB = gltf.scene;
+                modelB.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+                modelB.rotation.y = Math.PI;
+                const animations = gltf.animations;
+                //Animation Mixerインスタンスを生成
+                mixerB = new AnimationMixer(modelB);
+                // 設定した一つ目のアニメーションを設定
+                let animation = animations[0];
+                // アニメーションを変数walkにセット
+                setWalkB(mixerB.clipAction(animation));
+                // test.glbを3D空間に追加;
+                scene.add(modelB);
+                setModelsB(modelB);
+              },
+              (xhr) => {
+                console.log("ロード中");
+              },
+              (error) => {
+                console.error("読み込めませんでした");
+              }
+            );
+
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
