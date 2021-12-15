@@ -36,7 +36,7 @@ export default function App() {
   useEffect(() => {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
-    // const socket = io("https://localhost:3000");
+    if (modelsB !== null)
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
         modelsB.position.set(data.x, 0, data.z);
