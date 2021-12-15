@@ -36,18 +36,18 @@ export default function App() {
   useEffect(() => {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
-    if (modelsB !== null)
+    socket.on("disconnect", () => {
+      console.log("disconnected");
+    });
+    socket.on("connect", () => {
+      modelsB.position.set(0, 0, 0);
       socket.on("FromAPI", (data) => {
-        console.log(data)
+        console.log(data);
         modelsB.position.set(data.x, 0, data.z);
         modelsB.rotation.y = data.y;
         walkB.paused = data.w;
         walkB.play();
       });
-    socket.on("disconnect", () => {
-      console.log("disconnected");
-    });
-    socket.on("connect", () => {
       console.log("connected");
     });
     // models の位置情報をサーバーに送信
