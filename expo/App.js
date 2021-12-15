@@ -22,8 +22,10 @@ export default function App() {
   const [walkA, setWalkA] = useState(true);
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
+  const [action, setAction] = useState({ z: 0, x: 0 });
   const socketRef = useRef();
 
+  // FromAPIと名付けて座標と回転、歩いているか否かの値をサーバーに送る
   const send = (props) => {
     socketRef.current.emit("FromAPI", {
       x: props.x,
@@ -36,8 +38,10 @@ export default function App() {
   useEffect(() => {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
+    // 接続されたときにFromAPIから座標と回転、歩いているか否かの値を受け取る
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
+        // 相手のキャラクターに値をセットする
         modelsB.position.set(data.x, 0, data.z);
         modelsB.rotation.y = data.y;
         walkB.paused = data.w;
@@ -59,16 +63,18 @@ export default function App() {
   const move = (props) => {
     walkA.paused = false;
     walkA.play(); // 変数walkを再生
+    setAction({ z: props.y, x: props.x });
     TweenMax.to(modelsA.position, 0.1, {
-      z: modelsA.position.z + props.y,
-      x: modelsA.position.x + props.x,
-    });
+      z: modelsA.position.z + action.z,
+      x: modelsA.position.x + action.x,
+    }); // リピート指定
     TweenMax.to(cameras.position, 0.1, {
-      z: cameras.position.z + props.y,
-      x: cameras.position.x + props.x,
+      z: cameras.position.z + action.z,
+      x: cameras.position.x + action.x,
     });
     // y座標を反転させ radian に加算し前後左右にいい感じで向くようにする
     modelsA.rotation.y = Math.atan2(-props.y, props.x) + 1.5;
+    // サーバーに自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
     send({
       x: modelsA.position.x,
       y: modelsA.rotation.y,
@@ -78,7 +84,9 @@ export default function App() {
   };
   // Position.jsから画面から指を離すことで発火する
   const end = () => {
+    // アニメーションをストップ
     walkA.paused = true;
+    // ストップした時の自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
     send({
       x: modelsA.position.x,
       y: modelsA.rotation.y,
