@@ -11,7 +11,7 @@ import {
   AnimationMixer,
   Clock,
 } from "three";
-import Positon from "./Position";
+import Positon from "../expo/Position";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Asset } from "expo-asset";
 import io from "socket.io-client";
@@ -36,24 +36,24 @@ export default function App() {
   useEffect(() => {
     // サーバーのアドレス
     const socket = io("https://vrm.syeha.com/");
+    socket.on("disconnect", () => {
+      console.log("disconnected");
+    });
     socket.on("connect", () => {
+      modelsB.position.set(0, 0, 0);
       socket.on("FromAPI", (data) => {
+        console.log(data);
         modelsB.position.set(data.x, 0, data.z);
         modelsB.rotation.y = data.y;
         walkB.paused = data.w;
         walkB.play();
       });
-    });
-    socket.on("disconnect", () => {
-      console.log("disconnected");
-    });
-    socket.on("connect", () => {
       console.log("connected");
     });
     // models の位置情報をサーバーに送信
     socketRef.current = socket;
     return () => socket.disconnect();
-  }, [modelsB]);
+  }, [socketRef]);
 
   // TweenMax.to(何が, 何秒で, { z軸に distance 分移動 })
   const move = (props) => {
