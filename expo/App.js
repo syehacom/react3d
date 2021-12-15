@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View } from "react-native";
 import { GLView } from "expo-gl";
 import { Renderer } from "expo-three";
@@ -14,39 +14,78 @@ import {
 import Positon from "./Position";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Asset } from "expo-asset";
-import { decode, encode } from "base-64";
-
-if (!global.btoa) {
-  global.btoa = encode;
-}
-
-if (!global.atob) {
-  global.atob = decode;
-}
+import io from "socket.io-client";
 
 export default function App() {
   const [cameras, setCameras] = useState(null);
-  const [models, setModels] = useState(null);
-  const [walk, setWalk] = useState(true);
+  const [modelsA, setModelsA] = useState(null);
+  const [walkA, setWalkA] = useState(true);
+  const [modelsB, setModelsB] = useState(null);
+  const [walkB, setWalkB] = useState(true);
+  const socketRef = useRef();
+
+  const send = (props) => {
+    socketRef.current.emit("FromAPI", {
+      x: props.x,
+      y: props.y,
+      z: props.z,
+      w: props.w,
+    });
+  };
+
+  useEffect(() => {
+    // サーバーのアドレス
+    const socket = io("https://vrm.syeha.com/");
+    socket.on("connect", () => {
+      socket.on("FromAPI", (data) => {
+        console.log(data);
+        modelsB.position.set(data.x, 0, data.z);
+        modelsB.rotation.y = data.y;
+        walkB.paused = data.w;
+        walkB.play();
+      });
+    });
+    socket.on("disconnect", () => {
+      console.log("disconnected");
+    });
+    socket.on("connect", () => {
+      console.log("connected");
+    });
+    // models の位置情報をサーバーに送信
+    socketRef.current = socket;
+    return () => socket.disconnect();
+  }, [socketRef]);
 
   // TweenMax.to(何が, 何秒で, { z軸に distance 分移動 })
   const move = (props) => {
-    walk.paused = false;
-    walk.play(); // 変数walkを再生
-    TweenMax.to(models.position, 0.1, {
-      z: models.position.z + props.y,
-      x: models.position.x + props.x,
+    walkA.paused = false;
+    walkA.play(); // 変数walkを再生
+    TweenMax.to(modelsA.position, 0.1, {
+      z: modelsA.position.z + props.y,
+      x: modelsA.position.x + props.x,
     });
     TweenMax.to(cameras.position, 0.1, {
       z: cameras.position.z + props.y,
       x: cameras.position.x + props.x,
     });
     // y座標を反転させ radian に加算し前後左右にいい感じで向くようにする
-    models.rotation.y = Math.atan2(-props.y, props.x) + 1.5;
+    modelsA.rotation.y = Math.atan2(-props.y, props.x) + 1.5;
+    send({
+      x: modelsA.position.x,
+      y: modelsA.rotation.y,
+      z: modelsA.position.z,
+      w: walkA.paused,
+    });
   };
   // Position.jsから画面から指を離すことで発火する
   const end = () => {
-    walk.paused = true;
+    walkA.paused = true;
+    send({
+      x: modelsA.position.x,
+      y: modelsA.rotation.y,
+      z: modelsA.position.z,
+      w: walkA.paused,
+    });
   };
 
   return (
@@ -66,27 +105,57 @@ export default function App() {
 
             // GLTFをロードする
             const loader = new GLTFLoader();
-            const asset = Asset.fromModule(require("./assets/test.glb"));
-            await asset.downloadAsync();
 
-            let mixer;
-            let clock = new Clock();
+            const assetA = Asset.fromModule(require("./assets/testA.glb"));
+            await assetA.downloadAsync();
+
+            let mixerA;
+            let clockA = new Clock();
             loader.load(
-              asset.uri || "",
+              assetA.uri || "",
               (gltf) => {
-                const model = gltf.scene;
-                model.position.set(0, 0, 0); // 配置される座標 (x,y,z)
-                model.rotation.y = Math.PI;
+                const modelA = gltf.scene;
+                modelA.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+                modelA.rotation.y = Math.PI;
                 const animations = gltf.animations;
                 //Animation Mixerインスタンスを生成
-                mixer = new AnimationMixer(model);
+                mixerA = new AnimationMixer(modelA);
                 // 設定した一つ目のアニメーションを設定
                 let animation = animations[0];
                 // アニメーションを変数walkにセット
-                setWalk(mixer.clipAction(animation));
+                setWalkA(mixerA.clipAction(animation));
                 // test.glbを3D空間に追加
-                scene.add(model);
-                setModels(model);
+                scene.add(modelA);
+                setModelsA(modelA);
+              },
+              (xhr) => {
+                console.log("ロード中");
+              },
+              (error) => {
+                console.error("読み込めませんでした");
+              }
+            );
+
+            let mixerB;
+            let clockB = new Clock();
+            const assetB = Asset.fromModule(require("./assets/testB.glb"));
+            await assetB.downloadAsync();
+            loader.load(
+              assetB.uri || "",
+              (gltf) => {
+                const modelB = gltf.scene;
+                modelB.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+                modelB.rotation.y = Math.PI;
+                const animations = gltf.animations;
+                //Animation Mixerインスタンスを生成
+                mixerB = new AnimationMixer(modelB);
+                // 設定した一つ目のアニメーションを設定
+                let animation = animations[0];
+                // アニメーションを変数walkにセット
+                setWalkB(mixerB.clipAction(animation));
+                // test.glbを3D空間に追加;
+                scene.add(modelB);
+                setModelsB(modelB);
               },
               (xhr) => {
                 console.log("ロード中");
@@ -112,12 +181,16 @@ export default function App() {
               cameraInitialPositionY,
               cameraInitialPositionZ
             );
+
             const render = () => {
               requestAnimationFrame(render); // アニメーション　moveUd関数、moveLr関数でカメラ座標が移動
               renderer.render(scene, camera); // レンダリング
               //Animation Mixerを実行
-              if (mixer) {
-                mixer.update(clock.getDelta());
+              if (mixerA) {
+                mixerA.update(clockA.getDelta());
+              }
+              if (mixerB) {
+                mixerB.update(clockB.getDelta());
               }
               gl.endFrameEXP(); // 現在のフレームを表示する準備ができていることをコンテキストに通知するpresent (Expo公式)
             };
