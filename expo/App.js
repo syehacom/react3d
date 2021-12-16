@@ -8,32 +8,22 @@ import {
   GridHelper,
   PerspectiveCamera,
   Scene,
-  AnimationMixer,
-  Clock,
+  AnimationMixer, // アニメーションのため追加
+  Clock, // アニメーションのため追加
 } from "three";
-import Positon from "./Position";
+import Positon from "./Position"; // バーチャルスティックのjs
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Asset } from "expo-asset";
+import { Asset } from "expo-asset"; // ファイル読み込みのため追加
 import io from "socket.io-client";
 
 export default function App() {
   const [cameras, setCameras] = useState(null);
-  const [modelsA, setModelsA] = useState(null);
-  const [walkA, setWalkA] = useState(true);
+  const [modelsA, setModelsA] = useState(null); // 3Dモデルをセットする変数
+  const [walkA, setWalkA] = useState(true); // アニメーションをセットする変数
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
   const socketRef = useRef();
-
-  // FromAPIと名付けて座標と回転、歩いているか否かの値をサーバーに送る
-  const send = (props) => {
-    socketRef.current.emit("FromAPI", {
-      x: props.x,
-      y: props.y,
-      z: props.z,
-      w: props.w,
-    });
-  };
 
   useEffect(() => {
     // サーバーのアドレス
@@ -59,6 +49,16 @@ export default function App() {
     return () => socket.disconnect();
   }, [modelsB]);
 
+  // FromAPIと名付けて座標と回転、歩いているか否かの値をサーバーに送る
+  const send = (props) => {
+    socketRef.current.emit("FromAPI", {
+      x: props.x,
+      y: props.y,
+      z: props.z,
+      w: props.w,
+    });
+  };
+
   const walk = () => {
     // 自分のキャラクターとカメラの視点を同時に座標移動させて三人称視点にする
     TweenMax.to(modelsA.position, 0.1, {
@@ -82,9 +82,9 @@ export default function App() {
   // TweenMax.to(何が, 何秒で, { z軸にdistance分移動 })
   const move = (props) => {
     walkA.paused = false; // キャラクターのポーズを解除
-    walkA.play(); // 変数walkを再生
+    walkA.play(); // // アニメーションである変数walkを再生
     setAction({ z: props.y, x: props.x }); // Position.jsから受け取った座標を変数actionにセット
-    walk();
+    walk(); // walk関数を実行
   };
   // Position.jsから画面から指を離すことで発火する
   const end = () => {
@@ -211,12 +211,14 @@ export default function App() {
       </View>
       <View style={{ flexDirection: "row", alignSelf: "center" }}>
         <Positon
+          // Position.jsからonMoveを受け取ってmove関数を実行
           onMove={(data) => {
             move({
               x: (data.x - 60) / 1000,
               y: (data.y - 60) / 1000,
             });
           }}
+          // Position.jsからonEndを受け取ってend関数を実行
           onEnd={end}
         />
       </View>

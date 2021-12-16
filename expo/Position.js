@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import { View, Text } from "react-native";
 
 export default function Position(props) {
+  // onMoveは画面にタッチして指を動かした時に発火するイベント App.jsに渡す
+  // onEndは画面から指を話した時に発火するイベント App.jsに渡す
   const { onMove, onEnd } = props;
 
   const largeRadius = 90; // 大きい円の半径
   const smallRadius = largeRadius / 3; // 小さい円の半径
-
+  //円形バーチャルスティックの中心座標を設定
   const [x, setX] = useState(largeRadius - smallRadius); // 大きい円の半径 - 小さい円の半径の差 x
   const [y, setY] = useState(largeRadius - smallRadius); // 大きい円の半径 - 小さい円の半径の差 y
 
   const handleTouchMove = (e) => {
     const touchX = e.nativeEvent.locationX; // 画面をタッチしたときのx座標
     const touchY = e.nativeEvent.locationY; // 画面をタッチしたときのy座標
-    // タッチした座標から小さい円の半径を差し引いた円の中心の座標
+    // タッチした座標から小さい円の半径を差し引いた円の中心の座標を設定
     let coordinates = {
       x: touchX - smallRadius,
       y: touchY - smallRadius,
@@ -29,7 +31,7 @@ export default function Position(props) {
     setY(Math.min(coordinates.y, limitY));
     onMove({ x: x, y: y });
   };
-
+  // 指を話した時に実行される関数、座標を中心（初期座標）に戻しonEndイベントを渡す
   const handleTouchEnd = () => {
     setX(largeRadius - smallRadius);
     setY(largeRadius - smallRadius);
@@ -48,7 +50,7 @@ export default function Position(props) {
           style={{
             width: 2 * largeRadius, // 半径 * 2
             height: 2 * largeRadius,
-            borderRadius: largeRadius,
+            borderRadius: largeRadius, // 円形にする
             backgroundColor: "black",
           }}
         >
@@ -57,7 +59,7 @@ export default function Position(props) {
             style={{
               height: 2 * smallRadius, // 半径 * 2
               width: 2 * smallRadius,
-              borderRadius: smallRadius,
+              borderRadius: smallRadius, // 円形にする
               backgroundColor: "blue",
               position: "absolute",
               transform: [{ translateX: x }, { translateY: y }],
