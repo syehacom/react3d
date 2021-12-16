@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
 
-export default function Stick(props) {
+export default function Position(props) {
   const { onMove, onEnd } = props;
 
   const largeRadius = 90; // 大きい円の半径

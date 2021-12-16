@@ -49,10 +49,10 @@ export default function App() {
       });
     });
     socket.on("disconnect", () => {
-      console.log("disconnected");
+      console.log("接続が切れました");
     });
     socket.on("connect", () => {
-      console.log("connected");
+      console.log("接続されました");
     });
     // models の位置情報をサーバーに送信
     socketRef.current = socket;
@@ -64,16 +64,18 @@ export default function App() {
     walkA.paused = false;
     walkA.play(); // 変数walkを再生
     setAction({ z: props.y, x: props.x });
-    TweenMax.to(modelsA.position, 0.1, {
-      z: modelsA.position.z + action.z,
-      x: modelsA.position.x + action.x,
-    }); // リピート指定
-    TweenMax.to(cameras.position, 0.1, {
-      z: cameras.position.z + action.z,
-      x: cameras.position.x + action.x,
-    });
+    setTimeout(() => {
+      TweenMax.to(modelsA.position, 0.1, {
+        z: `+= ${action.z}`,
+        x: `+= ${action.x}`,
+      });
+      TweenMax.to(cameras.position, 0.1, {
+        z: `+= ${action.z}`,
+        x: `+= ${action.x}`,
+      });
+    }, 100);
     // y座標を反転させ radian に加算し前後左右にいい感じで向くようにする
-    modelsA.rotation.y = Math.atan2(-props.y, props.x) + 1.5;
+    modelsA.rotation.y = Math.atan2(-action.z, action.x) + 1.5;
     // サーバーに自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
     send({
       x: modelsA.position.x,
