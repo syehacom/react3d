@@ -59,22 +59,17 @@ export default function App() {
     return () => socket.disconnect();
   }, [modelsB]);
 
-  // TweenMax.to(何が, 何秒で, { z軸に distance 分移動 })
-  const move = (props) => {
-    walkA.paused = false;
-    walkA.play(); // 変数walkを再生
-    setAction({ z: props.y, x: props.x });
-    setTimeout(() => {
-      TweenMax.to(modelsA.position, 0.1, {
-        z: `+= ${action.z}`,
-        x: `+= ${action.x}`,
-      });
-      TweenMax.to(cameras.position, 0.1, {
-        z: `+= ${action.z}`,
-        x: `+= ${action.x}`,
-      });
-    }, 100);
-    // y座標を反転させ radian に加算し前後左右にいい感じで向くようにする
+  const walk = () => {
+    // 自分のキャラクターとカメラの視点を同時に座標移動させて三人称視点にする
+    TweenMax.to(modelsA.position, 0.1, {
+      z: `+= ${action.z}`,
+      x: `+= ${action.x}`,
+    });
+    TweenMax.to(cameras.position, 0.1, {
+      z: `+= ${action.z}`,
+      x: `+= ${action.x}`,
+    });
+    // Math.atan2で算出したradianに1.5を加算し前後左右にいい感じで向くようにする
     modelsA.rotation.y = Math.atan2(-action.z, action.x) + 1.5;
     // サーバーに自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
     send({
@@ -83,6 +78,13 @@ export default function App() {
       z: modelsA.position.z,
       w: walkA.paused,
     });
+  };
+  // TweenMax.to(何が, 何秒で, { z軸にdistance分移動 })
+  const move = (props) => {
+    walkA.paused = false; // キャラクターのポーズを解除
+    walkA.play(); // 変数walkを再生
+    setAction({ z: props.y, x: props.x }); // Position.jsから受け取った座標を変数actionにセット
+    walk();
   };
   // Position.jsから画面から指を離すことで発火する
   const end = () => {

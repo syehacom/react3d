@@ -18,7 +18,7 @@ export default function Position(props) {
       x: touchX - smallRadius,
       y: touchY - smallRadius,
     };
-    // atan2でラジアンを算出する
+    // Math.atan2でラジアンを算出する
     const radian = Math.atan2(y, x);
     // 大きい円と小さい円の中心が接している座標を算出
     // ラジアンからコサインを算出し、大きい円の半径と乗算し座標を算出する
