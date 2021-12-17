@@ -18,6 +18,8 @@ import Positon from "./Position"; // バーチャルスティック
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Asset } from "expo-asset"; // ファイル読み込みのため追加
 import io from "socket.io-client";
+import Slider from "@react-native-community/slider";
+import { Restart } from "fiction-expo-restart";
 
 export default function App() {
   const [cameras, setCameras] = useState(null);
@@ -26,7 +28,9 @@ export default function App() {
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
-  const [daruma, setDaruma] = useState(false);
+  const [daruma, setDaruma] = useState(false); // 監視物体が赤色かどうかの変数
+  const [timer, setTimer] = useState(0); // サーバーからランダムな数値を受け取る変数
+  const [slide, setSlide] = useState(300); // スライドの変数
   const socketRef = useRef();
 
   useEffect(() => {
@@ -47,6 +51,10 @@ export default function App() {
     });
     socket.on("connect", () => {
       console.log("接続されました");
+    });
+    // サーバーからランダムな値を受け取り変数timerにセット
+    socket.on("ping", (data) => {
+      setTimer(data);
     });
     // models の位置情報をサーバーに送信
     socketRef.current = socket;
@@ -69,7 +77,6 @@ export default function App() {
       z: `+= ${action.z}`,
       x: `+= ${action.x}`,
     });
-    console.log(cameras.position)
     // Math.atan2で算出したradianに1.5を加算し前後左右にいい感じで向くようにする
     modelsA.rotation.y = Math.atan2(-action.z, action.x) + 1.5;
     // サーバーに自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
@@ -86,18 +93,19 @@ export default function App() {
     walkA.play(); // // アニメーションである変数walkを再生
     setAction({ z: props.y, x: props.x }); // Position.jsから受け取った座標を変数actionにセット
     walk(); // walk関数を実行
-    // 変数darumaがtrue（敵物体の色が赤）の時、変数damageにtrueをセット
+    // 変数darumaがtrue（監視物体ーの色が赤）の時、変数darumaにtrueをセット
+    // 関数moveが実行されているときにdarumaがtrueなら初期座標に戻る
     if (daruma) {
       TweenMax.set(modelsA.position, {
         x: 0,
         y: 0,
-        z: 0,
+        z: 25,
       });
-       TweenMax.set(cameras.position, {
-         x: 0,
-         y: 2,
-         z: 7,
-       });
+      TweenMax.set(cameras.position, {
+        x: 0,
+        y: 2,
+        z: 32,
+      });
       walkA.paused = true;
       send({
         x: modelsA.position.x,
@@ -119,10 +127,18 @@ export default function App() {
       w: walkA.paused,
     });
   };
-
+  // サーバーからランダムな値を受け取るごとに反応
   useEffect(() => {
+    // 変数slideが0を下回った時は再起動（ゲームオーバー）
+    if (slide < 0) {
+      Restart();
+    }
+    // 1秒間隔で変数timerの値分を回転に増加させる
     setInterval(() => {
-      cube.rotation.y += 0.1;
+      cube.rotation.y += timer;
+      // 変数slideに300からの残数値をセット、スライダーに表示させる
+      setSlide(300 - Math.trunc(cube.rotation.y));
+      // 整数に丸めた値が3の倍数の場合、監視物体を色redに、変数darumaをtrueにセット
       if (Math.trunc(cube.rotation.y) % 3 === 0) {
         cube.material.color.set("red");
         setDaruma(true);
@@ -130,8 +146,8 @@ export default function App() {
         cube.material.color.set("gray");
         setDaruma(false);
       }
-    }, 500);
-  }, []);
+    }, 1000);
+  }, [timer]);
 
   return (
     <>
@@ -159,7 +175,7 @@ export default function App() {
               assetA.uri || "",
               (gltf) => {
                 const modelA = gltf.scene;
-                modelA.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+                modelA.position.set(0, 0, 25); // 配置される座標 (x,y,z)
                 modelA.rotation.y = Math.PI;
                 const animations = gltf.animations;
                 //Animation Mixerインスタンスを生成
@@ -188,7 +204,7 @@ export default function App() {
               assetB.uri || "",
               (gltf) => {
                 const modelB = gltf.scene;
-                modelB.position.set(0, 0, 0); // 配置される座標 (x,y,z)
+                modelB.position.set(0, 0, 25); // 配置される座標 (x,y,z)
                 modelB.rotation.y = Math.PI;
                 const animations = gltf.animations;
                 //Animation Mixerインスタンスを生成
@@ -214,6 +230,7 @@ export default function App() {
             cube = new Mesh(geometry, material); // geometryとmaterialでオブジェクト完成
             cube.position.set(0, 5, -50); // 配置される座標 (x,y,z)
             scene.add(cube); // 3D空間に追加
+
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
@@ -224,7 +241,7 @@ export default function App() {
             // カメラの初期座標
             let cameraInitialPositionX = 0;
             let cameraInitialPositionY = 2;
-            let cameraInitialPositionZ = 7;
+            let cameraInitialPositionZ = 32;
             // カメラの座標
             camera.position.set(
               cameraInitialPositionX,
@@ -248,7 +265,18 @@ export default function App() {
           }}
         />
       </View>
-      <View style={{ flexDirection: "row", alignSelf: "center" }}>
+      <View style={{ alignSelf: "center" }}>
+        <Slider
+          style={{ marginRight: 10, width: 200, height: 30 }}
+          minimumValue={0}
+          maximumValue={300}
+          minimumTrackTintColor="black"
+          maximumTrackTintColor="white"
+          value={slide}
+          thumbTintColor={"blue"}
+        />
+      </View>
+      <View style={{ alignSelf: "center" }}>
         <Positon
           // Position.jsからonMoveを受け取ってmove関数を実行
           onMove={(data) => {

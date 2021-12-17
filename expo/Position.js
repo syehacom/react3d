@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 
 export default function Position(props) {
   // onMoveは画面にタッチして指を動かした時に発火するイベント App.jsに渡す
@@ -41,9 +41,6 @@ export default function Position(props) {
   return (
     <>
       <View>
-        <Text>
-          x:{Math.trunc(x - 60)}, y:{Math.trunc(y - 60)}
-        </Text>
         <View
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}

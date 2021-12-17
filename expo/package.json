@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/slider": "3.0.3",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/stack": "^6.0.6",
     "expo": "~42.0.1",
@@ -16,6 +17,7 @@
     "expo-status-bar": "~1.0.4",
     "expo-three": "^6.0.1",
     "expo-three-orbit-controls": "^2.0.0",
+    "fiction-expo-restart": "^1.1.0",
     "gsap": "^3.6.0",
     "react": "^18.0.0-rc.0",
     "react-dom": "~16.13.1",
