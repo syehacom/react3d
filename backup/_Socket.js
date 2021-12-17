@@ -22,6 +22,7 @@ export default function App() {
   const [walkA, setWalkA] = useState(true);
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
+  const [modelsC, setModelsC] = useState(null)
   const socketRef = useRef();
 
   const send = (props) => {
@@ -86,6 +87,10 @@ export default function App() {
       w: walkA.paused,
     });
   };
+
+  const daruma = () => {
+
+  }
 
   return (
     <>
@@ -162,6 +167,8 @@ export default function App() {
                 console.error("読み込めませんでした");
               }
             );
+            // 敵キャラクターを設置
+            
 
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)

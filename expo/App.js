@@ -10,8 +10,11 @@ import {
   Scene,
   AnimationMixer, // アニメーションのため追加
   Clock, // アニメーションのため追加
+  BoxGeometry,
+  MeshLambertMaterial,
+  Mesh,
 } from "three";
-import Positon from "./Position"; // バーチャルスティックのjs
+import Positon from "./Position"; // バーチャルスティック
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Asset } from "expo-asset"; // ファイル読み込みのため追加
 import io from "socket.io-client";
@@ -23,6 +26,7 @@ export default function App() {
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
+  const [daruma, setDaruma] = useState(false);
   const socketRef = useRef();
 
   useEffect(() => {
@@ -61,14 +65,11 @@ export default function App() {
 
   const walk = () => {
     // 自分のキャラクターとカメラの視点を同時に座標移動させて三人称視点にする
-    TweenMax.to(modelsA.position, 0.1, {
+    TweenMax.set([modelsA.position, cameras.position], {
       z: `+= ${action.z}`,
       x: `+= ${action.x}`,
     });
-    TweenMax.to(cameras.position, 0.1, {
-      z: `+= ${action.z}`,
-      x: `+= ${action.x}`,
-    });
+    console.log(cameras.position)
     // Math.atan2で算出したradianに1.5を加算し前後左右にいい感じで向くようにする
     modelsA.rotation.y = Math.atan2(-action.z, action.x) + 1.5;
     // サーバーに自分のキャラクターの座標と回転、歩いているか否かの値をsend関数に渡す
@@ -85,6 +86,26 @@ export default function App() {
     walkA.play(); // // アニメーションである変数walkを再生
     setAction({ z: props.y, x: props.x }); // Position.jsから受け取った座標を変数actionにセット
     walk(); // walk関数を実行
+    // 変数darumaがtrue（敵物体の色が赤）の時、変数damageにtrueをセット
+    if (daruma) {
+      TweenMax.set(modelsA.position, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
+       TweenMax.set(cameras.position, {
+         x: 0,
+         y: 2,
+         z: 7,
+       });
+      walkA.paused = true;
+      send({
+        x: modelsA.position.x,
+        y: modelsA.rotation.y,
+        z: modelsA.position.z,
+        w: walkA.paused,
+      });
+    }
   };
   // Position.jsから画面から指を離すことで発火する
   const end = () => {
@@ -98,6 +119,19 @@ export default function App() {
       w: walkA.paused,
     });
   };
+
+  useEffect(() => {
+    setInterval(() => {
+      cube.rotation.y += 0.1;
+      if (Math.trunc(cube.rotation.y) % 3 === 0) {
+        cube.material.color.set("red");
+        setDaruma(true);
+      } else {
+        cube.material.color.set("gray");
+        setDaruma(false);
+      }
+    }, 500);
+  }, []);
 
   return (
     <>
@@ -174,7 +208,12 @@ export default function App() {
                 console.error("読み込めませんでした");
               }
             );
-
+            // 監視物体を設置
+            const geometry = new BoxGeometry(3, 10, 3); // 四角い物体
+            const material = new MeshLambertMaterial({ color: "gray" }); // 物体に光を反射させ色や影を表現する
+            cube = new Mesh(geometry, material); // geometryとmaterialでオブジェクト完成
+            cube.position.set(0, 5, -50); // 配置される座標 (x,y,z)
+            scene.add(cube); // 3D空間に追加
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
