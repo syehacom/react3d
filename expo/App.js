@@ -129,7 +129,7 @@ export default function App() {
         walkC.play();
         setTimeout(() => {
           setOut(true);
-        }, 250);
+        }, 500);
       }
       setTimeout(() => {
         if (modelsC !== null) {
