@@ -10,16 +10,11 @@ import {
   Scene,
   AnimationMixer, // アニメーションのため追加
   Clock, // アニメーションのため追加
-  BoxGeometry,
-  MeshLambertMaterial,
-  Mesh,
 } from "three";
 import Positon from "./Position"; // バーチャルスティック
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Asset } from "expo-asset"; // ファイル読み込みのため追加
 import io from "socket.io-client";
-import Slider from "@react-native-community/slider";
-import { Restart } from "fiction-expo-restart";
 
 export default function App() {
   const [cameras, setCameras] = useState(null);
@@ -27,10 +22,11 @@ export default function App() {
   const [walkA, setWalkA] = useState(true); // アニメーションをセットする変数
   const [modelsB, setModelsB] = useState(null);
   const [walkB, setWalkB] = useState(true);
+  const [modelsC, setModelsC] = useState(null);
+  const [walkC, setWalkC] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
   const [daruma, setDaruma] = useState(false); // 監視物体が赤色かどうかの変数
-  const [timer, setTimer] = useState(0); // サーバーからランダムな数値を受け取る変数
-  const [slide, setSlide] = useState(300); // スライドの変数
+  const [light, setLight] = useState({ color: 16777215 });
   const socketRef = useRef();
 
   useEffect(() => {
@@ -54,7 +50,7 @@ export default function App() {
     });
     // サーバーからランダムな値を受け取り変数timerにセット
     socket.on("ping", (data) => {
-      setTimer(data);
+      setDaruma(data);
     });
     // models の位置情報をサーバーに送信
     socketRef.current = socket;
@@ -127,27 +123,24 @@ export default function App() {
       w: walkA.paused,
     });
   };
-  // サーバーからランダムな値を受け取るごとに反応
   useEffect(() => {
-    // 変数slideが0を下回った時は再起動（ゲームオーバー）
-    if (slide < 0) {
-      Restart();
-    }
-    // 1秒間隔で変数timerの値分を回転に増加させる
-    setInterval(() => {
-      cube.rotation.y += timer;
-      // 変数slideに300からの残数値をセット、スライダーに表示させる
-      setSlide(300 - Math.trunc(cube.rotation.y));
-      // 整数に丸めた値が3の倍数の場合、監視物体を色redに、変数darumaをtrueにセット
-      if (Math.trunc(cube.rotation.y) % 3 === 0) {
-        cube.material.color.set("red");
-        setDaruma(true);
-      } else {
-        cube.material.color.set("gray");
-        setDaruma(false);
+    if (daruma) {
+      if (modelsC !== null) {
+        walkC.play();
+        setLight({ color: 16711935 });
+        console.log(
+          
+        );
       }
-    }, 1000);
-  }, [timer]);
+      setTimeout(() => {
+        if (modelsC !== null) {
+          setDaruma(false);
+          setLight({ color: 16777215 });
+          walkC.stop();
+        }
+      }, 2500);
+    }
+  }, [daruma]);
 
   return (
     <>
@@ -163,7 +156,6 @@ export default function App() {
             renderer.setClearColor("white"); // 3D空間の配色
             const scene = new Scene(); // これが3D空間
             scene.add(new GridHelper(100, 100)); //グリッドを表示
-
             // GLTFをロードする
             const loader = new GLTFLoader();
             // 自分のキャラクターを設置
@@ -224,17 +216,40 @@ export default function App() {
                 console.error("読み込めませんでした");
               }
             );
-            // 監視物体を設置
-            const geometry = new BoxGeometry(3, 10, 3); // 四角い物体
-            const material = new MeshLambertMaterial({ color: "gray" }); // 物体に光を反射させ色や影を表現する
-            cube = new Mesh(geometry, material); // geometryとmaterialでオブジェクト完成
-            cube.position.set(0, 5, -50); // 配置される座標 (x,y,z)
-            scene.add(cube); // 3D空間に追加
-
+            // 敵のキャラクターを設置
+            let mixerC;
+            let clockC = new Clock();
+            const assetC = Asset.fromModule(require("./assets/testC.glb"));
+            await assetC.downloadAsync();
+            loader.load(
+              assetC.uri || "",
+              (gltf) => {
+                const modelC = gltf.scene;
+                modelC.position.set(0, 0, -25); // 配置される座標 (x,y,z)
+                modelC.rotation.y = Math.PI - 0.7;
+                const animations = gltf.animations;
+                //Animation Mixerインスタンスを生成
+                mixerC = new AnimationMixer(modelC);
+                // 設定した一つ目のアニメーションを設定
+                let animation = animations[0];
+                // アニメーションを変数walkにセット
+                setWalkC(mixerC.clipAction(animation));
+                // test.glbを3D空間に追加;
+                scene.add(modelC);
+                setModelsC(modelC);
+              },
+              (xhr) => {
+                console.log("ロード中");
+              },
+              (error) => {
+                console.error("読み込めませんでした");
+              }
+            );
             // 3D空間の光！
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
             scene.add(pointLight); //3D空間に追加
+            setLight(pointLight);
             // カメラが映し出す設定(視野角, アスペクト比, near, far)
             const camera = new PerspectiveCamera(45, width / height, 1, 1000);
             setCameras(camera);
@@ -259,21 +274,13 @@ export default function App() {
               if (mixerB) {
                 mixerB.update(clockB.getDelta());
               }
+              if (mixerC) {
+                mixerC.update(clockC.getDelta());
+              }
               gl.endFrameEXP(); // 現在のフレームを表示する準備ができていることをコンテキストに通知するpresent (Expo公式)
             };
             render();
           }}
-        />
-      </View>
-      <View style={{ alignSelf: "center" }}>
-        <Slider
-          style={{ marginRight: 10, width: 200, height: 30 }}
-          minimumValue={0}
-          maximumValue={300}
-          minimumTrackTintColor="black"
-          maximumTrackTintColor="white"
-          value={slide}
-          thumbTintColor={"blue"}
         />
       </View>
       <View style={{ alignSelf: "center" }}>
