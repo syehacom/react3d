@@ -224,7 +224,7 @@ export default function App() {
               assetC.uri || "",
               (gltf) => {
                 const modelC = gltf.scene;
-                modelC.position.set(0, 0, -25); // 配置される座標 (x,y,z)
+                modelC.position.set(0, 0, -40); // 配置される座標 (x,y,z)
                 modelC.rotation.y = Math.PI - 0.7;
                 const animations = gltf.animations;
                 //Animation Mixerインスタンスを生成
