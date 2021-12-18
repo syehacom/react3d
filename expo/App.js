@@ -33,6 +33,7 @@ export default function App() {
   const socket = io("https://vrm.syeha.com/");
   // サーバーからランダムな値を受け取り変数darumaにセット
   socket.on("ping", (data) => {
+    console.log(data)
     setDaruma(false)
     setDaruma(data);
   });
