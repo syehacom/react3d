@@ -25,8 +25,8 @@ export default function App() {
   const [modelsC, setModelsC] = useState(null);
   const [walkC, setWalkC] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
-  const [daruma, setDaruma] = useState(false); // 監視物体が赤色かどうかの変数
-  const [light, setLight] = useState({ color: 16777215 });
+  const [daruma, setDaruma] = useState(false);
+  const [out, setOut] = useState(false);
   const socketRef = useRef();
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function App() {
     walk(); // walk関数を実行
     // 変数darumaがtrue（監視物体ーの色が赤）の時、変数darumaにtrueをセット
     // 関数moveが実行されているときにdarumaがtrueなら初期座標に戻る
-    if (daruma) {
+    if (out) {
       TweenMax.set(modelsA.position, {
         x: 0,
         y: 0,
@@ -127,15 +127,14 @@ export default function App() {
     if (daruma) {
       if (modelsC !== null) {
         walkC.play();
-        setLight({ color: 16711935 });
-        console.log(
-          
-        );
+        setTimeout(() => {
+          setOut(true);
+        }, 250);
       }
       setTimeout(() => {
         if (modelsC !== null) {
           setDaruma(false);
-          setLight({ color: 16777215 });
+          setOut(false);
           walkC.stop();
         }
       }, 2500);
@@ -249,7 +248,6 @@ export default function App() {
             const pointLight = new PointLight(0xffffff, 2, 1000, 1); //一点からあらゆる方向への光源(色, 光の強さ, 距離, 光の減衰率)
             pointLight.position.set(0, 200, 200); //配置される座標 (x,y,z)
             scene.add(pointLight); //3D空間に追加
-            setLight(pointLight);
             // カメラが映し出す設定(視野角, アスペクト比, near, far)
             const camera = new PerspectiveCamera(45, width / height, 1, 1000);
             setCameras(camera);
