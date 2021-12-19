@@ -29,12 +29,12 @@ export default function App() {
   const [out, setOut] = useState(false);
   const socketRef = useRef();
 
+  // サーバーのアドレス
+  const socket = io("https://vrm.syeha.com/");
+  
   useEffect(() => {
-    // サーバーのアドレス
-    const socket = io("https://vrm.syeha.com/");
     // サーバーからランダムな値を受け取り変数darumaにセット
     socket.on("ping", (data) => {
-      console.log(data);
       setDaruma(false);
       setDaruma(data);
     });
@@ -42,8 +42,6 @@ export default function App() {
   }, [modelsC]);
 
   useEffect(() => {
-    // サーバーのアドレス
-    const socket = io("https://vrm.syeha.com/");
     // 接続されたときにFromAPIから座標と回転、歩いているか否かの値を受け取る
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
