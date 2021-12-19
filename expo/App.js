@@ -31,7 +31,7 @@ export default function App() {
 
   useEffect(() => {
     // サーバーのアドレス
-    const socket = io("https://vrm.syeha.com/");
+    const socket = io("http://192.168.0.31:3000");
     // サーバーからランダムな値を受け取り変数darumaにセット
     socket.on("enemy", (data) => {
       setDaruma(false);
@@ -42,7 +42,7 @@ export default function App() {
 
   useEffect(() => {
     // サーバーのアドレス
-    const socket = io("https://vrm.syeha.com/");
+    const socket = io("http://192.168.0.31:3000");
     // 接続されたときにFromAPIから座標と回転、歩いているか否かの値を受け取る
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
