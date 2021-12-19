@@ -26,15 +26,14 @@ export default function App() {
   const [walkC, setWalkC] = useState(true);
   const [action, setAction] = useState({ z: 0, x: 0 });
   const [daruma, setDaruma] = useState(false);
-  const [out, setOut] = useState(false);
+  const [stare, setStare] = useState(false);
   const socketRef = useRef();
 
-  // サーバーのアドレス
-  const socket = io("https://vrm.syeha.com/");
-  
   useEffect(() => {
+    // サーバーのアドレス
+    const socket = io("https://vrm.syeha.com/");
     // サーバーからランダムな値を受け取り変数darumaにセット
-    socket.on("ping", (data) => {
+    socket.on("enemy", (data) => {
       setDaruma(false);
       setDaruma(data);
     });
@@ -42,6 +41,8 @@ export default function App() {
   }, [modelsC]);
 
   useEffect(() => {
+    // サーバーのアドレス
+    const socket = io("https://vrm.syeha.com/");
     // 接続されたときにFromAPIから座標と回転、歩いているか否かの値を受け取る
     socket.on("connect", () => {
       socket.on("FromAPI", (data) => {
@@ -95,9 +96,8 @@ export default function App() {
     walkA.play(); // // アニメーションである変数walkを再生
     setAction({ z: props.y, x: props.x }); // Position.jsから受け取った座標を変数actionにセット
     walk(); // walk関数を実行
-    // 変数darumaがtrue（監視物体ーの色が赤）の時、変数darumaにtrueをセット
     // 関数moveが実行されているときにdarumaがtrueなら初期座標に戻る
-    if (out) {
+    if (stare) {
       TweenMax.set(modelsA.position, {
         x: 0,
         y: 0,
@@ -134,13 +134,13 @@ export default function App() {
       if (modelsC !== null) {
         walkC.play();
         setTimeout(() => {
-          setOut(true);
+          setStare(true);
         }, 500);
       }
       setTimeout(() => {
         if (modelsC !== null) {
           setDaruma(false);
-          setOut(false);
+          setStare(false);
           walkC.stop();
         }
       }, 2500);
