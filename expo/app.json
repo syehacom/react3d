@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo3d",
+    "name": "expo3d-client",
     "slug": "expo3d",
     "version": "1.0.0",
     "orientation": "portrait",

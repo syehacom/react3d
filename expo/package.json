@@ -8,21 +8,14 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@react-navigation/native": "^6.0.6",
-    "@react-navigation/stack": "^6.0.6",
     "expo": "~42.0.1",
     "expo-asset": "~8.3.3",
     "expo-gl": "^10.4.2",
-    "expo-status-bar": "~1.0.4",
     "expo-three": "^6.0.1",
-    "expo-three-orbit-controls": "^2.0.0",
     "gsap": "^3.6.0",
     "react": "^18.0.0-rc.0",
     "react-dom": "~16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
-    "react-native-safe-area-context": "~3.2.0",
-    "react-native-screens": "~3.4.0",
-    "react-native-webview": "11.6.2",
     "socket.io-client": "^4.4.0",
     "three": "0.132.0"
   },
