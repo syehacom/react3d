@@ -44,21 +44,30 @@ export default function Admin() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const Inputs = ({ onFileChange }) => (
-    <label
-      style={{
-        zIndex: "1",
-        border: "1px solid #ccc",
-        top: "10px",
-        height: "25px",
-        width: "110px",
-        position: "absolute",
-        marginTop: "50px",
-      }}
-    >
-      <input type="file" accept=".vrm" onChange={onFileChange} />
-    </label>
-  );
+  // const Inputs = ({ onFileChange }) => (
+  //   <label
+  //     style={{
+  //       zIndex: "1",
+  //       border: "1px solid #ccc",
+  //       top: "10px",
+  //       height: "25px",
+  //       width: "110px",
+  //       position: "absolute",
+  //       marginTop: "50px",
+  //     }}
+  //   >
+  //     <input type="file" accept=".vrm" onChange={onFileChange} />
+  //   </label>
+  // );
+
+  // const handleFileChange = useCallback(
+  //   async (event) => {
+  //     const url = URL.createObjectURL(event.target.files[0]);
+  //     await loadVRM(url);
+  //     URL.revokeObjectURL(url);
+  //   },
+  //   [loadVRM]
+  // );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -88,14 +97,6 @@ export default function Admin() {
   };
 
   const [currentVrm, loadVRM] = useVRM();
-  const handleFileChange = useCallback(
-    async (event) => {
-      const url = URL.createObjectURL(event.target.files[0]);
-      await loadVRM(url);
-      URL.revokeObjectURL(url);
-    },
-    [loadVRM]
-  );
 
   extend({ OrbitControls });
 
