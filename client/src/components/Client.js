@@ -15,10 +15,10 @@ import { Vector3 } from "three";
 import Vector from "../kalidokit/utils/vector.js";
 import socketIOClient from "socket.io-client";
 
-export default function Live() {
+export default function Client() {
   //socket.io
-  const ENDPOINT = process.env.REACT_APP_SERVER;
-  // const ENDPOINT = "http://localhost:3000";
+  // const ENDPOINT = process.env.REACT_APP_SERVER;
+  const ENDPOINT = "http://localhost:3000";
   const [response, setResponse] = useState("");
 
   useEffect(() => {
@@ -401,6 +401,8 @@ export default function Live() {
           <VRMS vrm={currentVrm} />
         </Suspense>
         <Controls />
+        <gridHelper />
+        <axesHelper />
       </Canvas>
     </>
   );

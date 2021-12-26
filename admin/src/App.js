@@ -1,5 +1,5 @@
 import React from "react";
-import Vrm from "./components/Vrm";
+import Admin from "./components/Admin";
 // import Sky from "./components/Sky";
 
 export default function App() {
@@ -27,7 +27,7 @@ export default function App() {
         }}
       >
         {/* <Sky /> */}
-        <Vrm />
+        <Admin />
       </div>
     </div>
   );

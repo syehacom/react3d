@@ -24,10 +24,10 @@ import Webcam from "react-webcam";
 import Vector from "../kalidokit/utils/vector.js";
 import socketIOClient from "socket.io-client";
 
-export default function Vrm() {
+export default function Admin() {
   //socket.io
-  const ENDPOINT = process.env.REACT_APP_SERVER;
-  // const ENDPOINT = "http://localhost:3000";
+  // const ENDPOINT = process.env.REACT_APP_SERVER;
+  const ENDPOINT = "http://localhost:3000";
   const socket = socketIOClient(ENDPOINT);
 
   const webcamRef = useRef(null);
@@ -571,7 +571,7 @@ export default function Vrm() {
 
   return (
     <>
-      <Inputs onFileChange={handleFileChange} />
+      {/* <Inputs onFileChange={handleFileChange} /> */}
       <Webcam
         ref={webcamRef}
         style={{ visibility: "hidden" }}
