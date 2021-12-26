@@ -25,7 +25,7 @@ import Vector from "../kalidokit/utils/vector.js";
 import socketIOClient from "socket.io-client";
 
 export default function Admin() {
-  //socket.io
+  // socket.io
   // const ENDPOINT = process.env.REACT_APP_SERVER;
   const ENDPOINT = "http://localhost:3000";
   const socket = socketIOClient(ENDPOINT);
@@ -344,7 +344,6 @@ export default function Admin() {
     delete results.multiFaceGeometry;
 
     if (socket !== undefined) {
-      console.log(results);
       socket.emit("FromAPI", results);
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.

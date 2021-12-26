@@ -16,7 +16,7 @@ import Vector from "../kalidokit/utils/vector.js";
 import socketIOClient from "socket.io-client";
 
 export default function Client() {
-  //socket.io
+  // socket.io
   // const ENDPOINT = process.env.REACT_APP_SERVER;
   const ENDPOINT = "http://localhost:3000";
   const [response, setResponse] = useState("");
@@ -31,7 +31,6 @@ export default function Client() {
     socket.on("FromAPI", (data) => {
       if (data) {
         setResponse(data);
-        console.log(response);
       }
     });
     // Animate model
@@ -52,6 +51,31 @@ export default function Client() {
     loadVRM("/avatar.vrm");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // const Inputs = ({ onFileChange }) => (
+  //   <label
+  //     style={{
+  //       zIndex: "1",
+  //       border: "1px solid #ccc",
+  //       top: "10px",
+  //       height: "25px",
+  //       width: "110px",
+  //       position: "absolute",
+  //       marginTop: "50px",
+  //     }}
+  //   >
+  //     <input type="file" accept=".vrm" onChange={onFileChange} />
+  //   </label>
+  // );
+
+  // const handleFileChange = useCallback(
+  //   async (event) => {
+  //     const url = URL.createObjectURL(event.target.files[0]);
+  //     await loadVRM(url);
+  //     URL.revokeObjectURL(url);
+  //   },
+  //   [loadVRM]
+  // );
 
   const VRMS = ({ vrm }) => {
     useFrame(({ mouse }, delta) => {
@@ -95,7 +119,7 @@ export default function Client() {
         zoomSpeed={0.2}
         enableDamping
         dampingFactor={0.2}
-        target={new Vector3(0, 0, 0)}
+        target={new Vector3(0, 1, -2)}
       />
     );
   };
@@ -395,6 +419,7 @@ export default function Client() {
 
   return (
     <>
+      {/* <Inputs onFileChange={handleFileChange} /> */}
       <Canvas camera={{ position: [0, 1, 1] }}>
         <directionalLight />
         <Suspense fallback={null}>
