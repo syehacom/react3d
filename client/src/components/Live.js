@@ -49,7 +49,7 @@ export default function Live() {
 
   // VRM
   useEffect(() => {
-    loadVRM("/animal.vrm");
+    loadVRM("/avatar.vrm");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -40,7 +40,7 @@ export default function Vrm() {
 
   // VRM
   useEffect(() => {
-    loadVRM("/animal.vrm");
+    loadVRM("/avatar.vrm");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
